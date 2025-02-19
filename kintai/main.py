@@ -65,10 +65,19 @@ class RumpsTest(App): #RumpsTesttというクラスを作成してその中に�
         respose=Window(message="Feed back?",dimensions=(300,200)).run()
         print(respose.text)
 
+    def make_work_list(self,sender):
+        makeworklist.make_work_list() #makeworklistのクラスのmake_work_listメゾットを呼び出し。引数なし
+
+    def make_work_list(self,sender):
+        makeworklist.make_work_list(1) #引数ありで実行。2回目のものが上書きされる
+
 if __name__=="__main__":
-    app=RumpsTest()
+    app=RumpsTest() #作ったクラスでappを作って走らせる
     app.run()
 
 
 #補足：
 #defは関数を定義するもの
+#モジュール = コードをまとめたファイル
+#クラス = データと動作をまとめた設計図
+#メソッド = クラスの中で定義された関数
