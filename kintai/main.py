@@ -8,7 +8,7 @@ import download,datetime,makeworklist
 
 class RumpsTest(App): #RumpsTesttというクラスを作成してその中に記載
     def __init__(self): #def__int__(self)の中でアプリ全体の設定
-        super(RumpsTest,self).__init__("kintai",icon="images/PC.png",title=None,quit_button="kintaiの終了") #super()は親クラス。selfはインタンス(オブジェクト)
+        super(RumpsTest,self).__init__("kintai",icon="images/start.png",title=None,quit_button="kintaiの終了") #super()は親クラス。selfはインタンス(オブジェクト)
         self.menu=[
           MenuItem("開始",callback=self.start),
           MenuItem("終了"),
@@ -20,8 +20,7 @@ class RumpsTest(App): #RumpsTesttというクラスを作成してその中に�
           MenuItem("環境設定"),
           MenuItem("詳細")
         ] #menu属性にMenuItem型で項目をリスト形式に記載
-        self.menu["開始"].add(MenuItem("開始1"))
-        self.menu["開始"].add(MenuItem("開始2"))
+        self.menu["開始"]
         self.menu["kintaiの出力"].add(MenuItem("今月",callback=self.make_work_list)) #kintaiの出力を押出た時、make_work_listをcallbackで呼び出し実行。今月をmenuにadd関数で項目を追加
         self.menu["kintaiの出力"].add(MenuItem("先月",callback=self.make_last_work_list))
 
@@ -46,7 +45,7 @@ class RumpsTest(App): #RumpsTesttというクラスを作成してその中に�
         count += 1 #countが0を1ずつ増やす
 
         #時間の表示形式を変更
-        pass_time=datetime.timedelta(seconds=int(cont)+1) #countが10だとtimedeltaが0:00:00に変換。countが75だとtimedeltaが0:01:15に変換
+        pass_time=datetime.timedelta(seconds=int(count)+1) #countが10だとtimedeltaが0:00:00に変換。countが75だとtimedeltaが0:01:15に変換
 
         #経過時間項目の横に時間を表示する
         self.menu["経過時間"].title="経過時間："+str(pass_time) #経過時間を文字列で表示
@@ -65,19 +64,29 @@ class RumpsTest(App): #RumpsTesttというクラスを作成してその中に�
             self.icon="images/hamster.png"
 
     def end(self,sender): #何かの終了を処理するために呼ばれるメソッド。
+        global my_timer,count #my_timer,countは引数　#グローバル変数（どこからでもアクセスできる変数)
+        count=0 #countを0に初期化
         print("終了")
+        #タイマー停止
+        my_timer.stop()
+        self.menu["終了"].set_callback(None)
+        self.menu["開始"].set_callback(self.start)
+        self.menu["取り消し"].set_callback(None)
+        self.menu["経過時間"].title="経過時間"
         #Window(): これは、ユーザーにフィードバックを求めるウィンドウを表示する命令
         #message="Feed back?": このメッセージがウィンドウに表示され「Feed back?」と表示
         #dimensions=(300, 200): ウィンドウの大きさを指定（幅300px、高さ200px）。
         #run(): ウィンドウを実行して、ユーザーが入力するまで待機する。
-        respose=Window(message="Feed back?",dimensions=(300,200)).run()
-        print(respose.text)
+        response = Window(message="Feed back?",dimensions=(300,200)).run()
+        record("終了",response.text)
+        self.icon="images/start.png"
+
 
     def make_work_list(self,sender):
         #makeworklist クラスの make_work_list メソッドを呼び出し。引数なし
         makeworklist.make_work_list()
 
-    def make_work_list(self,sender):
+    def make_last_work_list(self,sender):
         #1 という引数を make_work_list メソッドに渡す
         makeworklist.make_work_list(1) #引数ありで実行。2回目のものが上書きされる
 
