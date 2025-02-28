@@ -35,7 +35,10 @@ def get_mic_index(pa):
 #pyaudio ライブラリを使って、オーディオの設定やデバイスの操作を管理するオブジェクトを作成。
 pa=pyaudio.PyAudio()
 
-
+def record(pa,index,duration):
+  sampling_rate=44100
+  frame_size=1024
+  return
 device_count_pyaudio = pa.get_device_count()#get_device_count関数を作成
 print(device_count_pyaudio)
 
