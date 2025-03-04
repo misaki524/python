@@ -16,6 +16,7 @@ def get_mic_index(pa):
   mic_list=[]#max_input_channelsが1以上のマイクチャンネルのみを検索するためにmic_listという変数を定義
   #接続されているすべてのデバイスに対して繰り返し処理を行う。
   #device_count は、接続されているデバイスの数で、i は各デバイスのインデックス。
+  device_count = len(sd.query_devices())#get_device_count関数を作成
   for i in range(device_count):
       #sounddevice ライブラリの query_devices() 関数を使用して、デバイス番号 i に関する情報を取得。
       #この情報には、デバイスの名前、入力・出力チャンネル数などが含まれている。
@@ -38,9 +39,26 @@ pa=pyaudio.PyAudio()
 def record(pa,index,duration):
   sampling_rate=44100
   frame_size=1024
+
+  #ストリームを開く
+  stream=pa.open(format=pyaudio.paInt16,channels=1,
+                rate=sampling_rate,
+                input=True,
+                input_device_index=index,
+                frames_per_buffer=frame_size)
+  #ループの設定
+  dt=1/sampling_rate
+  #総録音時間(duration)をデータ記録間隔(dt)で割ることでdurationを構成する総データ点いくつあればいいかを計算する
+  n=int(((duration/dt)/frame_size))
+  print(n)
   return
-device_count_pyaudio = pa.get_device_count()#get_device_count関数を作成
-print(device_count_pyaudio)
+
+# マイクインデックスを取得
+mic_index = get_mic_index(pa)
+if mic_index is not None:
+    # 録音の長さを設定して録音開始
+    duration = 5  # 秒
+    audio_data = record(pa, mic_index, duration)
 
 #辞書型
 ##辞書型(dict型)とはkeyと値(value)がセットになったデータ型
