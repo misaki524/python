@@ -51,6 +51,14 @@ def record(pa,index,duration):
   #総録音時間(duration)をデータ記録間隔(dt)で割ることでdurationを構成する総データ点いくつあればいいかを計算する
   n=int(((duration/dt)/frame_size))
   print(n)
+
+#録音する
+  waveforom=[] #waveforomは入れ物最初空だがループ回るごとにstream.read(frame_size)に取得したフレームサイズ分のデータを追加していく
+  print('start')
+  for i in range(n):
+    frame=stream.read(frame_size)
+    waveforom.append(frame)
+
   return
 
 # マイクインデックスを取得
