@@ -4,6 +4,7 @@ import numpy as np #数値計算を行うライブラリ
 
 
 
+
 #sounddeviceライブラリの関数で接続されているオーディオデバイスの情報を取得
 #query_devices()感ん数が返したデバイスのリストの長さを取得しdevice_count変数にその数を代入する
 #device_count = len(sd.query_devices()) #デバイスの数取得
@@ -59,14 +60,36 @@ def record(pa,index,duration):
     frame=stream.read(frame_size)
     waveforom.append(frame)
 
-  return
+#ストリームの終了
+  stream.stop_stream()
+  stream.close()
+
+#データをまとめる
+  waveforom=b"".join(waveforom)#フレームごとに録音されたデータを結合させ、1つの長い波型をデータにする
+
+#バイトデータを数値データに変換
+#（bytes）を numpy の配列に変換するための関数。音声データが数値（整数）の配列にする
+  byte_to_num=np.frombuffer(waveforom,dtype="int16")
+
+#最大値を計算
+#2**16 は16ビットで表現できる最大の値 (65536) を意味します。
+#その半分が正の最大値なので、65536 / 2 = 32768 となり、その1つ少ない値が最大振幅 32767 です
+  max_value=float((2**16/2)-1)
+
+  return byte_to_num,sampling_rate
 
 # マイクインデックスを取得
 mic_index = get_mic_index(pa)
 if mic_index is not None:
     # 録音の長さを設定して録音開始
     duration = 5  # 秒
-    audio_data = record(pa, mic_index, duration)
+    #waveform の長さ（録音された音声データのサンプル数）と、その内容（音声データそのもの）を表示しています。
+    #len(waveform) で、録音されたデータの長さ（サンプル数）を取得し、waveform には実際の音声データが格納されています。
+    waveform,sampling_rate = record(pa, mic_index, duration)
+    print(len(waveform),waveform)
+
+#pyaudioを終了
+pa.terminate()
 
 #辞書型
 ##辞書型(dict型)とはkeyと値(value)がセットになったデータ型
