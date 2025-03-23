@@ -1,6 +1,11 @@
 import sounddevice as sd #オーディオの入出力の行うためのライブラリ
 import pyaudio #音声入力や出力を管理するための別のライブラリ
 import numpy as np #数値計算を行うライブラリ
+import soundfile as sf
+import matplotlib.pyplot as plt  # グラフ描画用のライブラリ
+import wave
+import os
+
 
 
 
@@ -77,10 +82,22 @@ def record(pa,index,duration):
   max_value=float((2**16/2)-1)
 
   return byte_to_num,sampling_rate
+def graph_plot(x,y):
+  #波風をグラフにする関数
+  #グラフ日設定
+  fig,ax=plt.subplots()
+  ax.set_xlabel('Time[s]')
+  ax.set_ylabel('Amplitude')
+  #データのプロット
+  ax.plot(x,y)
+  plt.show()
+  plt.close()
+  return
 
-# マイクインデックスを取得
-mic_index = get_mic_index(pa)
-if mic_index is not None:
+try:
+  # マイクインデックスを取得
+  mic_index = get_mic_index(pa)
+  if mic_index is not None:
     # 録音の長さを設定して録音開始
     duration = 5  # 秒
     #waveform の長さ（録音された音声データのサンプル数）と、その内容（音声データそのもの）を表示しています。
@@ -88,8 +105,28 @@ if mic_index is not None:
     waveform,sampling_rate = record(pa, mic_index, duration)
     print(len(waveform),waveform)
 
-#pyaudioを終了
-pa.terminate()
+    # WAVファイルに保存する
+    save_path = 'recorded.wav'  # ファイル保存先
+
+    # ファイル保存
+    with wave.open(save_path, mode='wb') as wb:
+        wb.setnchannels(1)  # モノラル
+        wb.setsampwidth(2)  # 16bit=2byte
+        wb.setframerate(sampling_rate)
+    print(f"音声を {save_path} に保存しました。")
+
+    #グラフをプロットする
+    dt=1/sampling_rate
+    t=np.arange(0,len(waveform)*dt,dt)#np.arange()で時間軸を作成取得済みの振り幅(y軸)と共に
+    waveform = waveform / 32768.0
+    graph_plot(t,waveform)#graph_plot関数に渡す
+
+finally:
+  # 必ず終了処理を実行
+  pa.terminate()
+  print('end')
+
+
 
 #辞書型
 ##辞書型(dict型)とはkeyと値(value)がセットになったデータ型
