@@ -5,6 +5,7 @@ import soundfile as sf
 import matplotlib.pyplot as plt  # グラフ描画用のライブラリ
 import wave
 import os
+import librosa
 
 
 
@@ -107,6 +108,13 @@ try:
 
     # WAVファイルに保存する
     save_path = 'recorded.wav'  # ファイル保存先
+
+    #ボイスチェンジする
+    n_steps=8
+    waveform_shfted=librosa.effects.pitch_shift(waveform,sr=sampling_rate,n_steps=n_steps)
+
+    #ピッチシフトされた音声を保存をする
+    sf.write('pitch_shift.wav',waveform_shfted,sampling_rate)
 
     # ファイル保存
     with wave.open(save_path, mode='wb') as wb:
