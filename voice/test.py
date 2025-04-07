@@ -113,15 +113,23 @@ try:
     n_steps=8
     waveform_shfted=librosa.effects.pitch_shift(waveform,sr=sampling_rate,n_steps=n_steps)
 
-    #ピッチシフトされた音声を保存をする
-    sf.write('pitch_shift.wav',waveform_shfted,sampling_rate)
+    # waveform_shfted を int16 に戻してから書き込む
+    # ピッチシフト後のデータは float32 なので、int16 型に戻す必要がある
+    waveform_shfted_int16 = np.int16(waveform_shfted * 32767)  # 音量の調整（-32768から32767の範囲）
+
 
     # ファイル保存
     with wave.open(save_path, mode='wb') as wb:
         wb.setnchannels(1)  # モノラル
         wb.setsampwidth(2)  # 16bit=2byte
         wb.setframerate(sampling_rate)
+        # データをWAVファイルに書き込む
+        wb.writeframes(bytearray(waveform))
     print(f"音声を {save_path} に保存しました。")
+
+    # 音声データを -1.0 から 1.0 の範囲に正規化
+    waveform = waveform.astype(np.float32)  # np.int16 -> np.float32 へ変換
+    waveform = waveform / 32768.0  # 16bitの音声データは -32768 から 32767 なので、32768で割る
 
     #グラフをプロットする
     dt=1/sampling_rate
