@@ -1,0 +1,28 @@
+Traceback (most recent call last):
+  File "/Users/kikuchi/.pyenv/versions/3.11.8/lib/python3.11/site-packages/rumps/rumps.py", line 1001, in callback_
+    return _internal.call_as_function_or_method(callback, self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kikuchi/.pyenv/versions/3.11.8/lib/python3.11/site-packages/rumps/_internal.py", line 46, in call_as_function_or_method
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kikuchi/python/python/kintai/main.py", line 36, in start
+    record("開始","") #開始という文字列を空の文字列を引数として渡す
+    ^^^^^^^^^^^^^^^^^
+  File "/Users/kikuchi/python/python/kintai/record.py", line 27, in record
+    "経過時間": str(elapsed_time) if elapsed_time is not None else "",
+                                     ^^^^^^^^^^^^
+NameError: name 'elapsed_time' is not defined
+Traceback (most recent call last):
+  File "/Users/kikuchi/.pyenv/versions/3.11.8/lib/python3.11/site-packages/rumps/rumps.py", line 1001, in callback_
+    return _internal.call_as_function_or_method(callback, self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kikuchi/.pyenv/versions/3.11.8/lib/python3.11/site-packages/rumps/_internal.py", line 46, in call_as_function_or_method
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kikuchi/python/python/kintai/main.py", line 36, in start
+    record("開始","") #開始という文字列を空の文字列を引数として渡す
+    ^^^^^^^^^^^^^^^^^
+  File "/Users/kikuchi/python/python/kintai/record.py", line 27, in record
+    "経過時間": str(elapsed_time) if elapsed_time is not None else "",
+                                     ^^^^^^^^^^^^
+NameError: name 'elapsed_time' is not defined

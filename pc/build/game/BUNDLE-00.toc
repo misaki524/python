@@ -1,0 +1,1 @@
+([('game', '/Users/kikuchi/python/python/pc/game', 'EXECUTABLE')],)

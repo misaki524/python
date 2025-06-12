@@ -1,3 +1,9 @@
+# スタートさせたいとき
+# nohup python main.py > output.log 2>&1 &
+# 終了させたいとき
+# kill [id]
+
+
 from rumps import * #MacOSのメニューバーアプリケーションを作成するためのライブラリ
 from record import * #record.pyの呼び出し
 #下記ファイルを一括インポート
@@ -29,6 +35,7 @@ class RumpsTest(App): #RumpsTesttというクラスを作成してその中に�
         #記録開始
         record("開始","") #開始という文字列を空の文字列を引数として渡す
         global my_timer,count #my_timer,countは引数　#グローバル変数（どこからでもアクセスできる変数)
+        self.start_time = datetime.datetime.now()
         count=0 #countを0に初期化
         my_timer= Timer(self.pass_time,1) #Timerクラスを処理１秒間ごとに処理をself.pass_timeに設定
         my_timer.start() #Timerを実際にスタートする
@@ -46,7 +53,7 @@ class RumpsTest(App): #RumpsTesttというクラスを作成してその中に�
 
         #時間の表示形式を変更
         pass_time=datetime.timedelta(seconds=int(count)+1) #countが10だとtimedeltaが0:00:00に変換。countが75だとtimedeltaが0:01:15に変換
-
+        print(f"pass_time: {pass_time}")
         #経過時間項目の横に時間を表示する
         self.menu["経過時間"].title="経過時間："+str(pass_time) #経過時間を文字列で表示
 
@@ -66,6 +73,11 @@ class RumpsTest(App): #RumpsTesttというクラスを作成してその中に�
     def end(self,sender): #何かの終了を処理するために呼ばれるメソッド。
         global my_timer,count #my_timer,countは引数　#グローバル変数（どこからでもアクセスできる変数)
         count=0 #countを0に初期化
+
+        elapsed = datetime.now() - self.start_time
+        elapsed_str = str(elapsed).split(".")[0]  # 小数点以下カット
+        response = Window(message=f"経過時間: {elapsed_str}\nFeed back?", dimensions=(300, 200)).run()
+        record("終了", response.text, elapsed_str)
         print("終了")
         #タイマー停止
         my_timer.stop()
@@ -77,7 +89,6 @@ class RumpsTest(App): #RumpsTesttというクラスを作成してその中に�
         #message="Feed back?": このメッセージがウィンドウに表示され「Feed back?」と表示
         #dimensions=(300, 200): ウィンドウの大きさを指定（幅300px、高さ200px）。
         #run(): ウィンドウを実行して、ユーザーが入力するまで待機する。
-        response = Window(message="Feed back?",dimensions=(300,200)).run()
         record("終了",response.text)
         self.icon="images/start.png"
 

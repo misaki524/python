@@ -24,6 +24,7 @@ def record(activity,text=""): #record関数は何かした情報をcsvに記録�
         "ID": id, #新しいID
         "Activity": activity, #活動内容
         "Time stamp": datetime.now(), #現在の日時
+        "経過時間": "",
         "Feed back": text #任意で渡されるフィードバック
     }])
 
