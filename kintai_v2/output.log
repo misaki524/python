@@ -1,0 +1,2 @@
+/Users/kikuchi/python/python/kintai_v2/record.py:47: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df["ID"] = df["ID"].ffill().astype(int)
