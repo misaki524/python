@@ -38,8 +38,8 @@ def make_work_list(self,sender):
 			"day":str(df[df["ID"]==case_id][df["Activity"]=="開始"]["Time stamp"].iloc[-1])[:10],
 			"start":str(df[df["ID"]==case_id][df["Activity"]=="開始"]["Time stamp"].iloc[-1])[-8:],
 			"end":str(df[df["ID"]==case_id][df["Activity"]=="終了"]["Time stamp"].iloc[-1])[-8:],
-			"feedback":str(df[df["ID"]==case_id][df["Activity"]=="終了"]["Feed back"].iloc[-1])}
-			,ignore_index=True)
+			"feedback":str(df[df["ID"]==case_id][df["Activity"]=="終了"]["Feed back"].iloc[-1])},
+      ignore_index=True)
 
 	#差分計算
 	result["time(min)"] = (pd.to_datetime(result["end"]) - pd.to_datetime(result["start"])).dt.total_seconds()
