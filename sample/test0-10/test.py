@@ -13,7 +13,7 @@ y="テスト"
 print(y)
 
 #float型の何か適当な値をxという変数に代入し
-z=1.23
+z=1.23+2.4
 print(z)
 print(type(z))
 

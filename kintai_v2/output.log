@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/kikuchi/.pyenv/versions/3.11.8/lib/python3.11/site-packages/rumps/rumps.py", line 1001, in callback_
+    return _internal.call_as_function_or_method(callback, self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kikuchi/.pyenv/versions/3.11.8/lib/python3.11/site-packages/rumps/_internal.py", line 46, in call_as_function_or_method
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/kikuchi/python/python/kintai_v2/main.py", line 47, in end
+    my_timer.stop()
+    ^^^^^^^^
+NameError: name 'my_timer' is not defined
