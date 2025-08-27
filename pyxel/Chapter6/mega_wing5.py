@@ -97,7 +97,7 @@ class Enemy:
     def __init__(self,game,kind,level,x,y):
         self.game=game
         self.kind=kind#敵の種類
-        self.leve=level#強さ
+        self.level=level#強さ
         self.x=x
         self.y=y
         self.life_time=0#生存期間

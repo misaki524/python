@@ -6,56 +6,31 @@ class Background:
     NUM_STARS=100 #星の数
 
     #背景を初期化してゲームに登録する
-    'インスタンスオブジェクトを作成する時に最初に自動的に呼ばれるメソッド(そのオブジェクトをどういう状態で作るか)'
-    'self.〇〇と書くとオブジェクトにデータを持たせられる'
     def __init__(self,game):
-        'gameには「ゲーム前たいを管理するクラスのインスタンス」が入っている'
         self.game=game #ゲームへの参照
-        '「星」を管理するリスト'
         self.stars=[] #星の座標と速度のリスト
 
         #星の座標と速度を初期化してリストに登録する
-        'for i in range(...)は繰り返し処理。Background.NUM_STARSが100なら0~99を順番に100回繰り返す'
-        'その繰り返しの中で毎回ランダムな(x,v,vy)を作ってself.startsに追加している'
-        '今回のコードではiをループの中で使っていないので「繰り返す回数だけ必要な場合」は _ でもOK'
         for i in range(Background.NUM_STARS):
             x=pyxel.rndi(0,pyxel.width-1) #X座標
             y=pyxel.rndi(0,pyxel.height-1) #Y座標
             vy=pyxel.rndf(1,2.5) #Y方向の速度
-            '結果としてself.startsには100個の星(座標と速度のタプル)が入る'
             self.stars.append((x,y,vy)) #タプルとしてリストに登録
         #ゲームに背景を登録する
         self.game.background=self
 
     #背景を更新する
     def update(self):
-        'iはリスト内のインデックス(何番目の星か)'
-        '(x,y,vy)はその星の情報'
-        'が同時に取得できる'
-        'enumerateでリストの中身を直接更新する'
         for i ,(x,y,vy) in enumerate(self.stars):
-            '星のy座標を速度分だけ下に移動させている。vyが大きいほど星が早く落ちる'
             y+=vy
-            'pyxel.heightは画面の縦の大きさ'
-            'もし画面下をこえたら y-=pyxel.height で画面の上に戻す'
-            'これにより星がループしているように見える'
             if y>=pyxel.height:#画面下から出たか
                 y-=pyxel.height#画面上に戻す
-            '更新した座標(x,y)と速度vyをもとのリストに戻している。次のフレームでも正しい位置で星が描画される'
             self.stars[i]=(x,y,vy)
 
     #背景を描画する
     def draw(self):
         #タイトル画面以外で銀河を描画する
-        'self.game.scene で今のゲーム画面の状態を表わす。self.game.SCENE_TITLEはタイトル画面を意味する定数'
-        '!= は「〜でないなら」という意味'
-        'タイトル画面じゃない時だけ銀河を描く'
         if self.game.scene!=self.game.SCENE_TITLE:#★条件の分岐を追加
-          '0, 0 → 画面の左上に描画'
-          '1 → 画像バンクの番号'
-          '0, 0 → 画像バンク内の切り出し位置（左上の座標）'
-          '120, 160 → 描画する幅と高さ'
-          '画像バンク1の左上から幅120×高さ160の画像を画面左上に描く'
           pyxel.blt(0,0,1,0,0,120,160)
 
         #星を描画する
@@ -65,22 +40,14 @@ class Background:
 
 #自機クラス
 class Player:
-    'プレイヤーが1フレームで動く速さ'
     MOVE_SPEED=2#移動速度
-    '弾を撃つ間隔。6フレーム毎に弾を打てる'
     SHOT_INTERVAL = 6  # 弾の発射間隔（★定数を追加）
 
     #自機を初期化してゲームに登録する
-    'ゲーム全体の情報を持つオブジェクト'
     def __init__(self,game,x,y):
-        'ゲームオブジェクトを保存 → 後でゲームの状態にアクセス可能'
         self.game=game#ゲームへの残照
-        '初期値を保存 →　プレーヤーの現在位置'
         self.x=x#X座標
         self.y=y#Y座標
-        '弾を撃つまでの残りフレーム数を管理する変数'
-        '０になると弾が撃てる'
-        '弾を撃ったらこの値をSHOT_INTERVALにリセットして再カウントする'
         self.shot_timer=0#弾発射までの残り時間(変数の追加)
 
         #ゲームに自機を登録する
@@ -89,98 +56,60 @@ class Player:
     # 自機を更新する
     def update(self):
         # キー入力で自機を移動させる
-        'pyxel.btn(KEY) は「キーが押されているか」をチェックする関数'
-        'Player.MOVE_SPEED は1フレームで動く距離'
         if pyxel.btn(pyxel.KEY_LEFT):
-            '左キー → x を減らす（左に移動）'
             self.x -= Player.MOVE_SPEED
         if pyxel.btn(pyxel.KEY_RIGHT):
-            '右キー → x を増やす（右に移動）'
             self.x += Player.MOVE_SPEED
         if pyxel.btn(pyxel.KEY_UP):
-            '上キー → y を減らす（上に移動）'
             self.y -= Player.MOVE_SPEED
         if pyxel.btn(pyxel.KEY_DOWN):
-            '下キー → y を増やす（下に移動）'
             self.y += Player.MOVE_SPEED
 
         # 自機が画面外に出ないようにする
-        '左端より左に行かない'
         self.x = max(self.x, 0)
-        '右端より右に行かない（自機の幅が8pxなので引いている）'
         self.x = min(self.x, pyxel.width - 8)
-        '上端より上に行かない'
         self.y = max(self.y, 0)
-        '下端より下に行かない（自機の高さが8px）'
         self.y = min(self.y, pyxel.height - 8)
 
         #弾を発射する
-        'shot_timer は弾のクールタイム（次の弾を撃つまでの待機時間）'
-        '0 になると弾を撃てる。毎フレーム1つずつ減らして時間をカウントダウンする'
         if self.shot_timer>0:#弾発射までの残り時間を減らす
             self.shot_timer-=1
 
-        'スペースキーが押されていて、かつ shot_timer が 0 のときに弾を撃つ'
-        '条件が揃わないと発射できないので連射制御ができる'
         if pyxel.btn(pyxel.KEY_SPACE) and self.shot_timer==0:
             #自機の弾の生成をする
-            'self.game → ゲームオブジェクトへの参照'
-            'Bullet.SIDE_PLAYER → 弾の所属（プレイヤー弾）'
-            'self.x, self.y-3 → 発射位置（自機の少し上から）'
-            '-90 → 弾の角度（上方向）'
-            '5 → 弾の速度'
             Bullet(self.game,Bullet.SIDE_PLAYER,self.x,self.y-3,-90,5)
             #弾発射音を再生する
-            '第1引数(3): 再生するチャンネル番号（0〜3まで指定可能）'
-            '第2引数(0): 再生するサウンド番号（エディタで作成した音）'
             pyxel.play(3,0)
             #次の球発射までの残り時間を設定する
-            'self.shot_timer を減らしていき、0になったら次の弾が撃てるようになる'
             self.shot_timer=Player.SHOT_INTERVAL
 
     # 自機を描画する
     def draw(self):
-        '自機の座標 (self.x, self.y) に画像バンク0の左上8×8のキャラを、現在の座標に表示'
         pyxel.blt(self.x, self.y, 0, 0, 0, 8, 8, 0)
 
 #敵クラス
 class Enemy:
-    '敵の種類を定数として定義'
     KIND_A=0#敵A
     KIND_B=1#敵B
     KIND_C=2#敵C
 
     #敵を初期化してゲームに登録する
     def __init__(self,game,kind,level,x,y):
-        'ゲーム全体の管理オブジェクトを保持し、他の要素（プレイヤー・敵リストなど）にアクセスできるようにしている'
         self.game=game
-        '敵の種類を保持（行動パターン分岐などに利用）'
         self.kind=kind#敵の種類
         self.level=level#強さ
-        'Enemyインスタンスが持つ座標'
         self.x=x
         self.y=y
-        '何フレーム生きているかのカウンタ。敵の動きや消滅タイミングに使う'
         self.life_time=0#生存期間
         #ゲームの敵リストに登録する
-        '生成時にゲームの敵リストへ自動登録'
         self.game.enemies.append(self)
 
     #自機の方向の角度を計算する
     def calc_player_angle(self):
-        'self.game → ゲーム全体の管理オブジェクト'
-        'self.game.player → ゲーム内の自機（プレイヤー）の参照'
-        '現在の自機の位置を取得する'
         player=self.game.player
-        '自機が存在しない（ゲームオーバーや未生成）場合の処理で該当しない場合は90を返す'
         if player is None:#自機が存在しない時
             return 90
         else:#自機が存在する時
-            '敵の位置 (self.x, self.y) から自機 (player.x, player.y) への角度 を計算'
-            'player:プレイヤー（自機）'
-            'self:この敵自身'
-            'player.y - self.y:プレイヤーまでの「上下の距離」'
-            'player.x - self.x:プレイヤーまでの「左右の距離」'
             return pyxel.atan2(player.y-self.y,player.x-self.x)
 
     #敵を更新する
@@ -268,6 +197,21 @@ class Bullet:
     def draw(self):
         src_x=0 if self.side==Bullet.SIDE_PLAYER else 8
         pyxel.blt(self.x,self.y,0,src_x,8,8,8,0)
+
+#キャラクター同士のヒットエリアが重なっているか確認する
+def check_collision(entity1,entity2):
+    entity1_x1=entity1.x+entity1.hit_area[0]
+    entity1_y1=entity1.y+entity1.hit_area[1]
+    entity1_x2=entity1.x+entity1.hit_area[2]
+    entity1_y2=entity1.y+entity1.hit_area[3]
+
+    entity2_x1=entity2.x+entity2.hit_area[0]
+    entity2_y1=entity2.y+entity2.hit_area[1]
+    entity2_x2=entity2.x+entity2.hit_area[2]
+    entity2_y2=entity2.y+entity2.hit_area[3]
+
+
+
 
 #ゲームクラス(ゲーム全体を管理するクラス)
 class Game:
