@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>現在時刻と15時以降の差分（時分秒）</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 80px;
+      height: 50vh;
+      background-image: url("./GRjcQJ0akAACz1t.jpg_large"); /* 背景画像 */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      font-family: monospace;
+    }
+    #clock, #diff {
+      font-size: 2em;
+      font-family: monospace;
+      background-color: rgba(0, 0, 0, 0.5); /* 半透明で文字を読みやすく */
+      padding: 5px 10px;
+      border-radius: 8px;
+      background-color:lavender;
+    }
+    #diff {
+      font-size: 4em;
+      font-family: monospace;
+      color: #ff5500;
+      background-color:  rgba(0, 0, 0, 0);
+    }
+    img {
+      margin-top: -20px;
+      max-width: 80%; /* 画面に収まるように */
+      height: auto;
+    }
+  </style>
+</head>
+<body style="margin-left: 50px" >
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <h1>定時ですよ</h1>
+    <img src="./02_まるっち.png" alt="定時アイコン" style="height: 100px;">
+  </div>
+  <div>現在時刻：<span id="clock"></span></div>
+  <div>定時以降の経過時間：<span id="diff"></span></div>
+  <script>
+    function updateDisplay() {
+      const now = new Date();
+      // 現在時刻（hh:mm:ss形式）
+      const h = now.getHours().toString().padStart(2, '0');
+      const m = now.getMinutes().toString().padStart(2, '0');
+      const s = now.getSeconds().toString().padStart(2, '0');
+      document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+      // 17時基準
+      const base = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 0, 0);
+      let diffSec = Math.floor((now - base) / 1000);
+      if (diffSec < 0) diffSec = 0;
+      // 差分をhh:mm:ssに変換
+      const diffH = Math.floor(diffSec / 3600);
+      const diffM = Math.floor((diffSec % 3600) / 60);
+      const diffS = diffSec % 60;
+      const formatted = `${diffH.toString().padStart(2, '0')}:${diffM.toString().padStart(2, '0')}:${diffS.toString().padStart(2, '0')}`;
+      document.getElementById('diff').textContent = formatted;
+    }
+    updateDisplay();
+    setInterval(updateDisplay, 1000);
+  </script>
+</body>
+</html>

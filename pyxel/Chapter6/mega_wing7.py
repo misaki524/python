@@ -56,6 +56,8 @@ class Player:
 
     #自機にダメージを与える
     def add_damage(self):
+        #爆発音エフェクトを生成する
+        Blast(self.game,self.x+4,self.y+4)#Blastインスタンスを生成する
         #BGMを止めて爆発音を再生する
         pyxel.stop()
         pyxel.play(0,2)
@@ -116,6 +118,7 @@ class Enemy:
         self.hit_area=(0,0,7,7)
         self.armor=self.level-1#装甲
         self.life_time=0#生存期間
+        self.is_damaged = False  # ダメージを受けたかどうか
         #ゲームの敵リストに登録する
         self.game.enemies.append(self)
 
@@ -186,7 +189,15 @@ class Enemy:
 
     #敵を描画する
     def draw(self):
-        pyxel.blt(self.x,self.y,0,self.kind*8+8,0,8,8,0)
+        if self.is_damaged:
+            self.is_damaged=False
+            for i in range(1,15):
+                pyxel.pal(i,15)#カラーパレットの色を変更する
+            pyxel.blt(self.x,self.y,0,self.kind*8+8,0,8,8,0)
+            pyxel.pal()#カラーパレットを初期状態にする
+        else:
+          pyxel.blt(self.x,self.y,0,self.kind*8+8,0,8,8,0)
+
 
 #弾クラス
 class Bullet:
@@ -267,6 +278,33 @@ def check_collision(entity1,entity2):
     #上記のどれでもなければ重なっている
     return True
 
+#爆発エフェクトクラス
+class Blast:
+    START_RADIUS=1#開始時の半径
+    END_RADIUS=8#終了時の半径
+
+    def __init__(self,game,x,y):
+        self.game=game
+        self.x=x
+        self.y=y
+        self.radius=Blast.START_RADIUS#爆発の半径
+
+        #ゲームの爆発エフェクトリストに登録する
+        game.blasts.append(self)
+
+    #爆発エフェクトを更新する
+    def update(self):
+        #半径を大きくする
+        self.radius+=1
+        #半径が大きくなったら爆発エフェクトリストから登録を削除する
+        if self.radius>Blast.END_RADIUS:
+            self.game.blasts.remove(self)
+
+    #爆発エフェクトを描画する
+    def draw(self):
+        pyxel.circ(self.x,self.y,self.radius,7)
+        pyxel.circb(self.x,self.y,self.radius,10)
+
 #ゲームクラス(ゲーム全体を管理するクラス)
 class Game:
     SCENE_TITLE=0#タイトル画面
@@ -290,6 +328,7 @@ class Game:
         self.enemies=[]#敵のリスト
         self.player_bullets=[]#自機の弾のリスト＃リストを追加
         self.enemy_bullets=[]#敵の弾のリスト＃リストを追加
+        self.blasts = []#爆発エフェクトの追加
 
         #背景を生成する(背景はシーンによらず常に存在する)
         Background(self)
