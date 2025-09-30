@@ -110,19 +110,25 @@ class Player:
 
 # 敵クラス
 class Enemy:
+    '''
+    敵の行動パターンを種類毎に分けている
+    '''
     KIND_A = 0  # 敵A（まっすぐ降りる＋たまに撃つ）
     KIND_B = 1  # 敵B（左右に動きながら降りる）
     KIND_C = 2  # 敵C（ゆっくり降りながら四方に弾を撃つ）
 
     # 敵を初期化してゲームに登録する
     def __init__(self, game, kind, level, x, y):
+        '''
+        敵を作るときに位置や種類を決めて、自動的にゲームに登録される
+        '''
         self.game = game
         self.kind = kind  # 敵の種類
         self.level = level  # 強さ
-        self.x = x
-        self.y = y
+        self.x = x #座標
+        self.y = y #座標
         self.hit_area = (0, 0, 7, 7)
-        self.armor = self.level - 1  # 装甲
+        self.armor = self.level - 1  # 装甲（何発耐えるか）
         self.life_time = 0  # 生存時間
         self.is_damaged = False  # ダメージを受けたかどうか ★追加
 
@@ -130,16 +136,18 @@ class Enemy:
         self.game.enemies.append(self)
 
     # 敵にダメージを与える
+    # 弾が当たったら装甲を減らす。0になったら爆発＆削除。
     def add_damage(self):
         if self.armor > 0:  # 装甲が残っている時
-            self.armor -= 1
-            self.is_damaged = True  # ★追加
+            self.armor -= 1 # 装甲を減らす
+            self.is_damaged = True  # 一瞬光る演出用フラグ
 
             # ダメージ音を再生する
             pyxel.play(2, 1, resume=True)  # チャンネル2で割り込み再生させる
             return
 
         # 爆発エフェクトを生成する
+        # 装甲がないなら爆発して消える
         Blast(self.game, self.x + 4, self.y + 4)  # ★追加
 
         # 爆発音を再生する
@@ -160,7 +168,7 @@ class Enemy:
         else:  # 自機が存在する時
             return pyxel.atan2(player.y - self.y, player.x - self.x)
 
-    # 敵を更新する
+    # 敵を更新する(敵の行動を1フレームごとに更新する処理)
     def update(self):
         # 生存時間をカウントする
         self.life_time += 1
@@ -168,35 +176,39 @@ class Enemy:
         # 敵Aを更新する
         if self.kind == Enemy.KIND_A:
             # 前方に移動させる
-            self.y += 1.2
+            self.y += 1.2# 下にまっすぐ進む
 
             # 一定時間毎に自機の方向に向けて弾を発射する
-            if self.life_time % 50 == 0:
+            if self.life_time % 50 == 0:# 50フレームごと
                 player_angle = self.calc_player_angle()
                 Bullet(self.game, Bullet.SIDE_ENEMY, self.x, self.y, player_angle, 2)
 
         # 敵Bを更新する
         elif self.kind == Enemy.KIND_B:
             # 前方に移動させる
-            self.y += 1
+            self.y += 1# 下に進む
 
             # 経過時間に応じて左右に移動する
-            if self.life_time // 30 % 2 == 0:
-                self.x += 1.2
+            if self.life_time // 30 % 2 == 0:#30フレームごとに進行方向が切り替わる
+                self.x += 1.2# 右へ
             else:
-                self.x -= 1.2
+                self.x -= 1.2# 左へ
 
         # 敵Cを更新する
         elif self.kind == Enemy.KIND_C:
             # 前方に移動させる
-            self.y += 0.8
+            self.y += 0.8# ゆっくり下に進む
 
             # 一定時間毎に４方向に弾を発射する
-            if self.life_time % 40 == 0:
-                for i in range(4):
+            if self.life_time % 40 == 0:# 40フレームごと
+                for i in range(4):#40フレームごとに4方向へ弾を撃つ
                     Bullet(self.game, Bullet.SIDE_ENEMY, self.x, self.y, i * 45 + 22, 2)
 
         # 敵が画面下から出たら敵リストから登録を削除する
+        '''
+        画面の下に出た敵はリストから削除
+        ゲーム処理が無駄に重くならないようにするためs
+        '''
         if self.y >= pyxel.height:  # 画面下から出たか
             if self in self.game.enemies:
                 self.game.enemies.remove(self)  # 敵リストから登録を削除する

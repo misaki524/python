@@ -126,11 +126,17 @@ class Enemy:
     def add_damage(self):
         if self.armor>0:#装甲が減っている時
             self.armor-=1
+            self.is_damaged=True
 
             #ダメージ音を再生する
             pyxel.play(2,1,resume=True)#チャンネル2で割り込み再生させる
             return
 
+        #爆発エフェクトを生成する
+        Blast(self.game,self.x+4,self.y+4)
+        #爆発音を再生する
+        pyxel.play(2,2,resume=True)#チャンネル2で割り込み再生をさせる
+  
         #敵をリストから削除する
         if self in self.game.enemies:#敵リストに登録させている時
             self.game.enemies.remove(self)
