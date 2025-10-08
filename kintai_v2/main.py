@@ -36,7 +36,7 @@ class RumpsTest(App):
       #メニューの更新
       self.menu["開始"].set_callback(None)
       self.menu["終了"].set_callback(self.end)
-      self.menu["取り消し"].set_callback(None)
+      self.menu["取り消し"].set_callback(self.cancel)
       self.menu["経過時間"].title="経過時間"
 
       #アイコンに色をつける
@@ -48,7 +48,7 @@ class RumpsTest(App):
 
       self.menu["終了"].set_callback(None)
       self.menu["開始"].set_callback(self.start)
-      self.menu["取り消し"].set_callback(None)
+      self.menu["取り消し"].set_callback(self.cancel)
       self.menu["経過時間"].title="経過時間"
 
       self.icon="./images.png"

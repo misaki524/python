@@ -57,7 +57,7 @@ def record(activity, text=""):
           current_year = datetime.now().year
           start_time = datetime.strptime(f"{current_year}-{start_time_str}", "%Y-%m-%d %H:%M:%S")
           end_time = datetime.strptime(f"{current_year}-{end_time_str}", "%Y-%m-%d %H:%M:%S")
-          work_time = end_time - start_time 
+          work_time = end_time - start_time
           df.at[df.index[-1], "Work Time"] = format_work_time(work_time)
 
     # CSVに保存
