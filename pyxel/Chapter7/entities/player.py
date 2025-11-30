@@ -1,6 +1,6 @@
 import pyxel
 from collision import get_tile_type,in_collision,push_back
-from constants import TILE_EXIT,TILE_GEM,TILE_LAVA,TILE_MUSHROOM,TILE_SPIKE
+from constants import TILE_EXIT,TILE_GEN,TILE_LAVA,TILE_MUSHROOM,TILE_SPIKE
 
 #プレイヤークラス
 class Player:
@@ -42,7 +42,7 @@ class Player:
                 y=self.y+i
                 tile_type=get_tile_type(x,y)
 
-                if tile_type==TILE_GEM:#宝石に触れた時
+                if tile_type==TILE_GEN:#宝石に触れた時
                     #スコアを加算する
                     self.game.score+=10
 
@@ -72,21 +72,23 @@ class Player:
       if (
           self.dy>=0
           and(
-              in_collision(self.x,self.y,+8) or in_collision(self.x+7,self.y+8)
+            in_collision(self.x,self.y+8) or in_collision(self.x+7,self.y+8)
           )
-          and(pyxel.btnp(pyxel.KEY_SPACE)) or pyxel.btnp(pyxel.GAMEPAD2_BUTTON_B)
+          and(
+            pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.GAMEPAD1_BUTTON_B)
+          )
       ):
-        #上昇中ではなくプレイヤーの左下または右下が床に接している状態で
-        #スペースキーまたはゲームパッドのBボタンが押された時
-        self.dy=-6
-        self.jump_counter=2
-        pyxel.play(3,0)
+          #上昇中ではなくプレイヤーの左下または右下が床に接している状態で
+          #スペースキーまたはゲームパッドのBボタンが押された時
+          self.dy=-6
+          self.jump_counter=2
+          pyxel.play(3,0)
 
-        #押し戻し状態
-        self.x,self,y=push_back(self.x,self.y,self.dx,self.dy)
+      #押し戻し状態
+      self.x,self.y=push_back(self.x,self.y,self.dx,self.dy)
 
-        #横方向の移動を減速する
-        self.dx=int(self.dx * 0.8)
+      #横方向の移動を減速する
+      self.dx=int(self.dx * 0.8)
 
     #プレイヤーを描画する
     def draw(self):

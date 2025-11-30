@@ -1,5 +1,5 @@
 #定数モジュール
-SCSROLL_BORDER_X=80#スクロール境界X座標
+SCROLL_BORDER_X=80#スクロール境界X座標
 #プレイヤーがこの座標を超えたらスクロールさせる
 
 #タイル種別
@@ -30,6 +30,7 @@ TILE_TO_TILETYPE={
     (6,2):TILE_WALL,
     (7,2):TILE_WALL,
     (1,3):TILE_WALL,
+    (2,3):TILE_WALL,
     (1,4):TILE_WALL,
     (1,5):TILE_WALL,
     (0,9):TILE_SLIME1_POINT,

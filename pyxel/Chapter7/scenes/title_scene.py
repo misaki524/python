@@ -6,6 +6,18 @@ class TitleScene:
     def __init__(self,game):
         self.game=game#ゲームクラス
         self.alpha=0.0#画面の透明度(0.0:透明,1.0:不透明)
+
+    #タイトル画面を開始する
+    def start(self):
+        #画面の透明度を初期化する
+        self.alpha=0.0
+        #プレイヤーを削除する
+        self.game.player=None
+        #全ての敵を削除する
+        self.game.enmies=[]
+        #BGMを再生する
+        pyxel.playm(0,loop=True)
+
     def update(self):
         #画面の透明度を変更須知
         if self.alpha<1.0:

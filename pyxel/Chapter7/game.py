@@ -1,5 +1,5 @@
 import pyxel
-from scenes import ClearScene,GameOverScene,Scene,PlayScene,TItleScene
+from scenes import ClearScene,GameOverScene,PlayScene,TitleScene
 
 #ゲームクラス
 class Game:
@@ -9,14 +9,14 @@ class Game:
         pyxel.init(128,128,title="Cursed Caverns")
 
         #リソースファイルを読み込む
-        pyxel.load(" ./assets/cursed_caverns.pyxres")
-        pyxel.tilemap[2].blt(0,0,0,0,256,16)#変更魔のマップをコピーする
+        pyxel.load("./assets/cursed_caverns.pyxres")
+        pyxel.tilemaps[2].blt(0,0,0,0,0,256,16)#変更魔のマップをコピーする
 
         #ゲーム状態を初期化する
         self.player=None#プレーヤー
         self.enemies=[]#敵のリスト
         self.scenes={
-            "title":TItleScene(self),
+            "title":TitleScene(self),
             "play":PlayScene(self),
             "gameover":GameOverScene(self),
             "clear":ClearScene(self),
@@ -32,12 +32,12 @@ class Game:
         pyxel.run(self.update,self.draw)
 
     #シーンを変更する
-    def chage_scene(self,scene_name):
+    def change_scene(self,scene_name):
         self.scenes_name=scene_name
         self.scenes[self.scenes_name].start()
 
     #フィールドを描画する
-    def draw_fild(self):
+    def draw_field(self):
         pyxel.bltm(0,0,0,self.screen_x,0,128,128)
 
     #プレイヤーを描画する

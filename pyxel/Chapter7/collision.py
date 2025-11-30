@@ -1,15 +1,15 @@
 #衝突処理モジュール
 import pyxel
-from constants import TITLE_NONE,TILE_TO_TILETYPE,TITLE_WALL
+from constants import TILE_NONE,TILE_TO_TILETYPE,TILE_WALL
 
 #設定した座標のタイトル種別を取得す
-def get_title_type(x,y):
-    title=pyxel.tilemaps[0].get(x//8,y//8)
-    return TILE_TO_TILETYPE.get(title,TITLE_NONE)
+def get_tile_type(x,y):
+    tile=pyxel.tilemaps[0].pget(x//8,y//8)
+    return TILE_TO_TILETYPE.get(tile,TILE_NONE)
 
 #指定した座標が壁と重なっているか判定する
 def in_collision(x,y):
-    return get_title_type(x,y)==TITLE_WALL
+    return get_tile_type(x,y)==TILE_WALL
 
 #キャラクターが壁と重なっているかを判定する
 def is_character_colliding(x,y):
@@ -26,3 +26,23 @@ def is_character_colliding(x,y):
                 return True#壁と衝突している
 
     return False#壁と衝突していない
+
+#押し戻した座標を返す
+def push_back(x,y,dx,dy):
+    #壁と衝突するまでに垂直方向に移動する
+    for _ in range(pyxel.ceil(abs(dy))):
+        step=max(-1,min(1,dy))
+        if is_character_colliding(x,y+step):
+            break
+        y+=step
+        dy-=step
+
+    #壁と衝突するまで水平方向に移動する
+    for _ in range(pyxel.ceil(abs(dx))):
+        step=max(-1,min(1,dx))
+        if is_character_colliding(x+step,y):
+            break
+        x+=step
+        dx-=step
+
+    return x,y
