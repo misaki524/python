@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>獣医一覧</h2>
+<p><a href="/vets/create">＋ 新規登録</a></p>
+<table>
+  <tr><th>ID</th><th>名前</th><th>専門</th><th>電話</th></tr>
+  {% for v in vets %}
+    <tr>
+      <td>{{ v.id }}</td>
+      <td>{{ v.name }}</td>
+      <td>{{ v.specialty }}</td>
+      <td>{{ v.phone }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

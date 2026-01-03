@@ -12,8 +12,9 @@ _db = get_db()
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    _db.init_app(app)
-    Migrate(app, _db)
+    db = get_db()
+    db.init_app(app)
+    Migrate(app, db)
 
     # Blueprint 登録
     app.register_blueprint(owners_bp, url_prefix="/owners")
@@ -28,3 +29,5 @@ def create_app():
     return app
 
 app = create_app()
+
+

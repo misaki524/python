@@ -1,4 +1,4 @@
-#!/Users/kikuchi/python/python/animal/.venv/bin/python
+#!/Users/kikuchi/python/python/animal/.venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

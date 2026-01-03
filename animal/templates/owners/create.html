@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>飼い主登録</h2>
+<form method="post">
+<label>名前* <input name="name" required></label><br>
+<label>電話 <input name="phone"></label><br>
+<label>Email <input name="email" placeholder="google@gmail.com" required type="email"></label><br>
+<label for="zipcode">郵便番号（ハイフンなし）</label> 
+  <input type="text" id="zipcode" placeholder="例: 4300807" onkeyup="getAddress()" maxlength="7"> <br>
+  <label for="address">住所</label> 
+  <input type="text" id="address" placeholder="住所が自動入力されます">
+</label><br>
+<button type="submit">保存</button>
+</form>
+
+<script>
+function getAddress() { let zipcode = document.getElementById("zipcode").value; if (zipcode.length === 7) { // 郵便番号が7桁になったら実行 
+  fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zipcode}`) .then(response => response.json()) .then(data => { if (data.results) { let result = data.results[0]; let address = result.address1 + result.address2 + result.address3; document.getElementById("address").value = address; } else { document.getElementById("address").value = "該当する住所が見つかりません"; } }) .catch(error => { console.error("エラー:", error); }); } }
+</script>
+
+{% endblock %}

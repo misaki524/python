@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>予約作成</h2>
+<form method="post">
+  <label>ペット* 
+    <select name="pet_id" required>
+      {% for p in pets %}<option value="{{ p.id }}">{{ p.name }}（{{ p.owner.name }}）</option>{% endfor %}
+    </select>
+  </label><br>
+  <label>獣医* 
+    <select name="vet_id" required>
+      {% for v in vets %}<option value="{{ v.id }}">{{ v.name }}</option>{% endfor %}
+    </select>
+  </label><br>
+  <label>予約日時*
+    <input type="datetime-local" name="start_at" required>
+  </label><br>
+  <label>理由*
+    <select name="reason" id="reason-select" name="reason" required>
+      <option value="">-- 選択してください --</option>
+      <option value="初診">初診</option>
+      <option value="再診">再診</option>
+      <option value="その他">その他</option>
+    </select>
+  </label><br>
+
+  <!-- 再診の詳細理由（表示非表示切り替え） -->
+  <div id="revisit-detail" style="display: none;">
+    <label>再診の内容*
+      <select name="reason_detail">
+        <option value="">-- 選択してください --</option>
+        <option value="ワクチン">ワクチン</option>
+        <option value="経過観察">経過観察</option>
+        <option value="術後チェック">術後チェック</option>
+      </select>
+    </label><br>
+  </div>
+  <button type="submit">保存</button>
+</form>
+
+<script>
+  const reasonSelect = document.getElementById("reason-select");
+  const revisitDetail = document.getElementById("revisit-detail");
+
+  reasonSelect.addEventListener("change", function () {
+    if (this.value === "再診") {
+      revisitDetail.style.display = "block";
+    } else {
+      revisitDetail.style.display = "none";
+    }
+  });
+</script>
+{% endblock %}

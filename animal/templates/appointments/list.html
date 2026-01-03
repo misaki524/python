@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>予約一覧</h2>
+<p><a href="/appointments/create">＋ 新規作成</a></p>
+<table>
+  <tr><th>ID</th><th>日時</th><th>ペット</th><th>獣医</th><th>理由</th><th>状態</th></tr>
+  {% for a in appointments %}
+    <tr>
+      <td>{{ a.id }}</td>
+      <td>{{ a.start_at.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ a.pet.name }}</td>
+      <td>{{ a.vet.name }}</td>
+      <td>{{ a.reason }}</td>
+      <td>{{ a.status }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

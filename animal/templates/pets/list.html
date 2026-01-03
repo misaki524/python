@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>ペット一覧</h2>
+<p><a href="/pets/create">＋ 新規登録</a></p>
+<table>
+  <tr><th>ID</th><th>名前</th><th>種別</th><th>品種</th><th>飼い主</th></tr>
+  {% for p in pets %}
+    <tr>
+      <td>{{ p.id }}</td>
+      <td>{{ p.name }}</td>
+      <td>{{ p.species }}</td>
+      <td>{{ p.breed }}</td>
+      <td>{{ p.owner.name }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

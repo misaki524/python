@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>飼い主一覧</h2>
+<p><a href="/owners/create">＋ 新規登録</a></p>
+<table>
+<tr><th>ID</th><th>名前</th><th>電話</th><th>Email</th><th>住所</th></tr>
+{% for o in owners %}
+<tr>
+<td>{{ o.id }}</td>
+<td>{{ o.name }}</td>
+<td>{{ o.phone }}</td>
+<td>{{ o.email }}</td>
+<td>{{ o.address }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

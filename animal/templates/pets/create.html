@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>ペット登録</h2>
+<form method="post">
+  <label>名前* <input name="name" required></label><br>
+  <label>種別* <input name="species" placeholder="dog/cat 等" required></label><br>
+  <label>品種 <input name="breed"></label><br>
+  <label>誕生日 <input name="birthdate" type="date"></label><br>
+  <label>飼い主* 
+    <select name="owner_id" required>
+      {% for o in owners %}<option value="{{ o.id }}">{{ o.name }}</option>{% endfor %}
+    </select>
+  </label><br>
+  <button type="submit">保存</button>
+</form>
+{% endblock %}

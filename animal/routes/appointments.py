@@ -33,7 +33,7 @@ def create_appointment():
         return redirect(url_for("appointments.show_create"))
 
     try:
-        dt = datetime.strptime(start_at, "%Y-%m-%d %H:%M")
+        dt = datetime.strptime(start_at, "%Y-%m-%dT%H:%M")
     except ValueError:
         flash("日時は YYYY-MM-DD HH:MM 形式で入力してください", "error")
         return redirect(url_for("appointments.show_create"))

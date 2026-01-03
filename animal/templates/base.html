@@ -3,19 +3,26 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>動物病院予約</title>
+    <title>{% block title %}動物病院予約{% endblock %}</title>
+    <div id="humberger">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <nav id="menu" class="hidden">
+      <a href="/">Home</a>
+      <a href="/owners/">飼い主</a>
+      <a href="/pets/">ペット</a>
+      <a href="/vets/">獣医</a>
+      <a href="/appointments/">予約</a>
+    </nav
+
     <link rel="stylesheet" href="/static/style.css">
+    {% block extra_css %}{% endblock %}
   </head>
   <body>
     <header>
       <h1>🏥 動物病院予約システム</h1>
-      <nav>
-        <a href="/">Home</a>
-        <a href="/owners/">飼い主</a>
-        <a href="/pets/">ペット</a>
-        <a href="/vets/">獣医</a>
-        <a href="/appointments/">予約</a>
-      </nav>
       <hr>
     </header>
     <main>
@@ -29,6 +36,7 @@
         {% endif %}
       {% endwith %}
       {% block content %}{% endblock %}
+      {% block extra_js %}{% endblock %}
     </main>
   </body>
 </html>
