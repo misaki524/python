@@ -44,7 +44,9 @@ def record(activity, text=""):
     df = pd.concat([df, new_row], ignore_index=True)
 
     # ID補完（前方補完）
-    df["ID"] = df["ID"].ffill().astype(int)
+    df["ID"] = df["ID"].ffill()
+    df = df.infer_objects(copy=False)
+    df["ID"] = df["ID"].astype(int)
 
   # 終了時に差分（勤務時間）を計算して記録
     if activity == "終了":
