@@ -1,54 +1,63 @@
+
+# 出勤簿作成用モジュール
 import pandas as pd
 import datetime
 import dateutil
+import os
 
-def make_work_list(self,sender):
 
-	#月の確認
-	month = datetime.datetime.today()
-	#前月分を出力したい場合(i=1)のための処理、差をとる
-	month = month - dateutil.relativedelta.relativedelta(months=i)
-	#整形
-	month = month.strftime("%Y-%m")
+def make_work_list(i=0):
+	"""
+	指定月（i=0:今月, i=1:先月, ...）の出勤簿をExcelで出力する
+	"""
+	# 月の計算
+	month = datetime.datetime.today() - dateutil.relativedelta.relativedelta(months=i)
+	month_str = month.strftime("%Y-%m")
 
-	#対象ファイルを指定
-	try:
-		df = pd.read_csv("datas/"+month+".csv")
-	except:
-		print("ファイルがありませんでした")
+	# 対象ファイルのパス
+	csv_path = f"datas/{month_str}.csv"
+	if not os.path.exists(csv_path):
+		print(f"ファイルがありませんでした: {csv_path}")
 		return
 
-	#出力用DataFrame
-	result = pd.DataFrame(columns=["day","start","end","feedback"])
+	# CSV読み込み
+	df = pd.read_csv(csv_path)
 
-	#ファイルの整形
+	# 出力用DataFrame
+	result = pd.DataFrame(columns=["day", "start", "end", "feedback"])
+
+	# 日付整形
 	df["Time stamp"] = pd.to_datetime(df["Time stamp"].str[:16])
 
-	#ユニークなcase_idを抽出
-	case_ids = df["ID"].unique()
-
-	#集計
-	for case_id in case_ids:
-		#取り消しがあったら記録しない
-		if "取り消し" in list(df[df["ID"]==case_id]["Activity"]):
+	# ユニークなIDごとに集計
+	for case_id in df["ID"].unique():
+		# 取り消しがあればスキップ
+		if "取り消し" in df[df["ID"] == case_id]["Activity"].values:
 			continue
+		# 開始・終了・フィードバック取得
+		start_row = df[(df["ID"] == case_id) & (df["Activity"] == "開始")]
+		end_row = df[(df["ID"] == case_id) & (df["Activity"] == "終了")]
+		if start_row.empty or end_row.empty:
+			continue
+		day = str(start_row["Time stamp"].iloc[-1])[:10]
+		start = str(start_row["Time stamp"].iloc[-1])[-8:]
+		end = str(end_row["Time stamp"].iloc[-1])[-8:]
+		feedback = str(end_row["Feed back"].iloc[-1])
+		# appendの代わりにconcat推奨
+		result = pd.concat([
+			result,
+			pd.DataFrame([{"day": day, "start": start, "end": end, "feedback": feedback}])
+		], ignore_index=True)
 
-		#TimeStampが汚いので複雑なコードになってます
-		result = result.append({
-			"day":str(df[df["ID"]==case_id][df["Activity"]=="開始"]["Time stamp"].iloc[-1])[:10],
-			"start":str(df[df["ID"]==case_id][df["Activity"]=="開始"]["Time stamp"].iloc[-1])[-8:],
-			"end":str(df[df["ID"]==case_id][df["Activity"]=="終了"]["Time stamp"].iloc[-1])[-8:],
-			"feedback":str(df[df["ID"]==case_id][df["Activity"]=="終了"]["Feed back"].iloc[-1])},
-      ignore_index=True)
-
-	#差分計算
-	result["time(min)"] = (pd.to_datetime(result["end"]) - pd.to_datetime(result["start"])).dt.total_seconds()
-	#分表示に
-	result["time(min)"] = result["time(min)"]/60
-	#曜日計算
+	# 差分計算（分単位）
+	result["time(min)"] = (pd.to_datetime(result["end"]) - pd.to_datetime(result["start"])) .dt.total_seconds() / 60
+	# 曜日計算
 	result["date"] = pd.to_datetime(result["day"]).dt.day_name()
-	#表示順変更
-	result = result.reindex(columns=["day","date","start","end","time(min)","feedback"])
+	# 表示順変更
+	result = result.reindex(columns=["day", "date", "start", "end", "time(min)", "feedback"])
 
-	#出力
-	result.to_excel("/Users/user_name.Downloads/{}_出勤簿.xlsx".format(month))
+	# 出力先パス（ユーザー名自動取得）
+	downloads_dir = os.path.expanduser("~/Downloads")
+	out_path = os.path.join(downloads_dir, f"{month_str}_出勤簿.xlsx")
+	result.to_excel(out_path, index=False)
+	print(f"出勤簿を出力しました: {out_path}")
