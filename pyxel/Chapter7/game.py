@@ -21,7 +21,7 @@ class Game:
             "gameover":GameOverScene(self),
             "clear":ClearScene(self),
         }#シーンの辞書
-        self.scenes_name=None#現在のシーン名
+        self.scenes_name="title"#現在のシーン名（初期値を'title'に）
         self.screen_x=0#フィールド表示範囲の左端のX座標
         self.score=0#得点
 
