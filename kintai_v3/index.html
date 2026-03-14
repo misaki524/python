@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="勤怠管理">
+  <title>勤怠管理アプリ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+      color: #333333;
+      min-height: 100vh;
+    }
+
+    /* ========================================
+       ヘッダー
+       ======================================== */
+    .header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 20px 16px 16px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .header-date {
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    .header-clock {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 8px 0;
+      letter-spacing: 1px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .status-none {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+
+    .status-working {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .status-break {
+      background: #FF9800;
+      color: white;
+    }
+
+    .status-done {
+      background: #9E9E9E;
+      color: white;
+    }
+
+    /* ========================================
+       メインコンテンツ
+       ======================================== */
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* ========================================
+       カード
+       ======================================== */
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 14px;
+    }
+
+    .info-label {
+      color: #999999;
+    }
+
+    .info-value {
+      font-weight: 500;
+    }
+
+    .info-value.empty {
+      color: #ccc;
+    }
+
+    /* ========================================
+       ボタン
+       ======================================== */
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px 8px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-clock-in {
+      background: #4CAF50;
+    }
+
+    .btn-clock-out {
+      background: #f44336;
+    }
+
+    .btn-break-start {
+      background: #FF9800;
+    }
+
+    .btn-break-end {
+      background: #2196F3;
+    }
+
+    .btn-save-report {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      margin-top: 14px;
+    }
+
+    /* ========================================
+       休憩履歴
+       ======================================== */
+    .break-list {
+      margin-top: 8px;
+    }
+
+    .break-item {
+      font-size: 13px;
+      padding: 4px 0;
+      color: #666;
+    }
+
+    .break-item .break-num {
+      color: #FF9800;
+      font-weight: 600;
+    }
+
+    .no-breaks {
+      font-size: 13px;
+      color: #ccc;
+      padding: 4px 0;
+    }
+
+    /* ========================================
+       日報テキストエリア
+       ======================================== */
+    .report-textarea {
+      width: 100%;
+      min-height: 120px;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .report-textarea:focus {
+      border-color: #667eea;
+    }
+
+    .report-textarea::placeholder {
+      color: #bbb;
+    }
+
+    /* ========================================
+       トースト通知
+       ======================================== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #333;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: pre-line;
+      text-align: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      max-width: 90vw;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.error {
+      background: #f44336;
+    }
+
+    /* ========================================
+       ローディング
+       ======================================== */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.5);
+      z-index: 500;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #e0e0e0;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ========================================
+       カスタム確認モーダル
+       ======================================== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 900;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 20px;
+      padding: 28px 24px 20px;
+      width: 300px;
+      max-width: 85vw;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+      animation: modalSlideUp 0.25s ease;
+    }
+
+    .modal-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .modal-message {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 22px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px 8px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .modal-btn:active {
+      transform: scale(0.96);
+    }
+
+    .modal-btn-cancel {
+      background: #f0f0f0;
+      color: #666;
+    }
+
+    .modal-btn-confirm {
+      background: linear-gradient(135deg, #f44336, #e91e63);
+      color: white;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes modalSlideUp {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <div class="header">
+    <h1>勤怠管理</h1>
+    <div class="header-date" id="headerDate">-</div>
+    <div class="header-clock" id="headerClock">--:--:--</div>
+    <span class="status-badge status-none" id="statusBadge">未出勤</span>
+  </div>
+
+  <div class="container">
+
+    <!-- 勤怠カード -->
+    <div class="card">
+      <div class="card-title">📋 勤怠</div>
+      <div id="sessionList">
+        <div class="info-row">
+          <span class="info-label">出勤</span>
+          <span class="info-value empty">---</span>
+        </div>
+      </div>
+      <div class="info-row" id="totalRow" style="display:none; border-top:1px solid #eee; margin-top:6px; padding-top:8px;">
+        <span class="info-label" style="font-weight:600;">合計勤務時間</span>
+        <span class="info-value" id="totalWorkHours">---</span>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-clock-in" id="btnClockIn" onclick="handleClockIn()">▶ 出勤</button>
+        <button class="btn btn-clock-out" id="btnClockOut" onclick="handleClockOut()" disabled>⏹ 退勤</button>
+      </div>
+    </div>
+
+    <!-- 休憩カード -->
+    <div class="card">
+      <div class="card-title">☕ 休憩</div>
+      <div id="breakList" class="break-list">
+        <div class="no-breaks">休憩記録なし</div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-break-start" id="btnBreakStart" onclick="handleBreakStart()" disabled>☕ 休憩開始</button>
+        <button class="btn btn-break-end" id="btnBreakEnd" onclick="handleBreakEnd()" disabled>💪 休憩終了</button>
+      </div>
+    </div>
+
+    <!-- 日報カード -->
+    <div class="card">
+      <div class="card-title">📝 日報</div>
+      <textarea class="report-textarea" id="reportText" placeholder="・会議参加&#10;・資料作成&#10;・コードレビュー"></textarea>
+      <button class="btn btn-save-report" id="btnSaveReport" onclick="handleSaveReport()">💾 日報を保存</button>
+    </div>
+
+  </div>
+
+  <!-- 退勤確認モーダル -->
+  <div class="modal-overlay" id="clockOutModal">
+    <div class="modal-box">
+      <div class="modal-icon">👋</div>
+      <div class="modal-title">退勤しますか？</div>
+      <div class="modal-message">お疲れさまでした</div>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" onclick="closeClockOutModal()">キャンセル</button>
+        <button class="modal-btn modal-btn-confirm" onclick="confirmClockOut()">退勤する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- トースト -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ローディング -->
+  <div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <script>
+    // ========================================
+    // リアルタイム時計（F-008）
+    // ========================================
+    function updateClock() {
+      var now = new Date();
+      var y = now.getFullYear();
+      var mo = ('0' + (now.getMonth() + 1)).slice(-2);
+      var d = ('0' + now.getDate()).slice(-2);
+      var days = ['日', '月', '火', '水', '木', '金', '土'];
+      var day = days[now.getDay()];
+      var h = ('0' + now.getHours()).slice(-2);
+      var mi = ('0' + now.getMinutes()).slice(-2);
+      var s = ('0' + now.getSeconds()).slice(-2);
+
+      document.getElementById('headerDate').textContent = y + '年' + mo + '月' + d + '日（' + day + '）';
+      document.getElementById('headerClock').textContent = h + ':' + mi + ':' + s;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ========================================
+    // トースト通知
+    // ========================================
+    var toastTimer = null;
+    function showToast(message, isError) {
+      var el = document.getElementById('toast');
+      el.textContent = message;
+      el.className = 'toast' + (isError ? ' error' : '');
+      // 強制リフロー
+      void el.offsetWidth;
+      el.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() {
+        el.classList.remove('show');
+      }, 3000);
+    }
+
+    // ========================================
+    // ローディング
+    // ========================================
+    function showLoading() {
+      document.getElementById('loading').classList.add('active');
+    }
+
+    function hideLoading() {
+      document.getElementById('loading').classList.remove('active');
+    }
+
+    // ========================================
+    // ボタン制御（複数セッション対応）
+    // ========================================
+    function updateButtons(status) {
+      var btnIn = document.getElementById('btnClockIn');
+      var btnOut = document.getElementById('btnClockOut');
+      var btnBrkS = document.getElementById('btnBreakStart');
+      var btnBrkE = document.getElementById('btnBreakEnd');
+
+      btnIn.disabled = true;
+      btnOut.disabled = true;
+      btnBrkS.disabled = true;
+      btnBrkE.disabled = true;
+
+      if (!status) {
+        // 未出勤 → 出勤可能
+        btnIn.disabled = false;
+      } else if (status === '休憩中') {
+        btnBrkE.disabled = false;
+      } else if (status === '出勤中') {
+        btnOut.disabled = false;
+        btnBrkS.disabled = false;
+      } else if (status === '退勤済') {
+        // 退勤済 → 再度出勤可能
+        btnIn.disabled = false;
+      }
+    }
+
+    // ========================================
+    // ステータスバッジ更新
+    // ========================================
+    function updateStatusBadge(status) {
+      var badge = document.getElementById('statusBadge');
+      badge.className = 'status-badge';
+
+      if (!status) {
+        badge.textContent = '未出勤';
+        badge.classList.add('status-none');
+      } else if (status === '休憩中') {
+        badge.textContent = '休憩中';
+        badge.classList.add('status-break');
+      } else if (status === '出勤中') {
+        badge.textContent = '勤務中';
+        badge.classList.add('status-working');
+      } else {
+        badge.textContent = '退勤済';
+        badge.classList.add('status-done');
+      }
+    }
+
+    // ========================================
+    // UI更新（複数セッション対応）
+    // ========================================
+    function renderStatus(data) {
+      // セッションリスト
+      var sessionListEl = document.getElementById('sessionList');
+      var sessions = data.sessions || [];
+
+      if (sessions.length === 0) {
+        sessionListEl.innerHTML = '<div class="info-row"><span class="info-label">出勤</span><span class="info-value empty">---</span></div>';
+      } else {
+        var html = '';
+        for (var i = 0; i < sessions.length; i++) {
+          var s = sessions[i];
+          var label = sessions.length > 1 ? '第' + s.num + '回' : '';
+          var clockOutStr = s.clockOut || '---';
+          var workStr = s.workHours || '---';
+          var activeTag = s.active ? ' <span style="color:#4CAF50;font-size:12px;">●記録中</span>' : '';
+
+          html += '<div style="' + (i > 0 ? 'border-top:1px solid #f0f0f0;margin-top:6px;padding-top:6px;' : '') + '">';
+          if (label) html += '<div style="font-size:12px;color:#999;margin-bottom:2px;">' + label + activeTag + '</div>';
+          else if (activeTag) html += '<div style="font-size:12px;">' + activeTag + '</div>';
+          html += '<div class="info-row"><span class="info-label">出勤</span><span class="info-value">' + s.clockIn + '</span></div>';
+          html += '<div class="info-row"><span class="info-label">退勤</span><span class="info-value' + (s.clockOut ? '' : ' empty') + '">' + clockOutStr + '</span></div>';
+          html += '<div class="info-row"><span class="info-label">勤務時間</span><span class="info-value' + (s.workHours ? '' : ' empty') + '">' + workStr + '</span></div>';
+          html += '</div>';
+        }
+        sessionListEl.innerHTML = html;
+      }
+
+      // 合計勤務時間（複数セッション時のみ表示）
+      var totalRow = document.getElementById('totalRow');
+      if (sessions.length > 1 && data.totalWorkHours) {
+        totalRow.style.display = 'flex';
+        document.getElementById('totalWorkHours').textContent = data.totalWorkHours;
+      } else {
+        totalRow.style.display = 'none';
+      }
+
+      // 休憩リスト
+      var breakListEl = document.getElementById('breakList');
+      if (data.breaks.length === 0) {
+        breakListEl.innerHTML = '<div class="no-breaks">休憩記録なし</div>';
+      } else {
+        var bhtml = '';
+        for (var j = 0; j < data.breaks.length; j++) {
+          var b = data.breaks[j];
+          var endStr = b.end || '...';
+          var durStr = b.duration ? ' (' + b.duration + ')' : '';
+          bhtml += '<div class="break-item"><span class="break-num">休憩' + (j + 1) + ':</span> '
+                + b.start + ' ~ ' + endStr + durStr + '</div>';
+        }
+        breakListEl.innerHTML = bhtml;
+      }
+
+      // 日報
+      var reportEl = document.getElementById('reportText');
+      if (data.report) {
+        reportEl.value = data.report;
+      }
+
+      // ステータス
+      var status = data.currentStatus || '';
+      updateStatusBadge(status);
+      updateButtons(status);
+    }
+
+    // ========================================
+    // データ取得
+    // ========================================
+    function loadTodayStatus() {
+      showLoading();
+      google.script.run
+        .withSuccessHandler(function(data) {
+          hideLoading();
+          renderStatus(data);
+        })
+        .withFailureHandler(function(err) {
+          hideLoading();
+          showToast('データ取得に失敗しました', true);
+          // エラー時もボタン状態を復元
+          resetButtonsToDefault();
+        })
+        .getTodayStatus();
+    }
+
+    function resetButtonsToDefault() {
+      // 全ボタンを一旦有効にして操作可能にする
+      document.getElementById('btnClockIn').disabled = false;
+      document.getElementById('btnClockOut').disabled = true;
+      document.getElementById('btnBreakStart').disabled = true;
+      document.getElementById('btnBreakEnd').disabled = true;
+    }
+
+    // ========================================
+    // 出勤
+    // ========================================
+    function handleClockIn() {
+      document.getElementById('btnClockIn').disabled = true;
+      showLoading();
+      google.script.run
+        .withSuccessHandler(function(res) {
+          hideLoading();
+          showToast(res.message, !res.success);
+          loadTodayStatus();
+        })
+        .withFailureHandler(function(err) {
+          hideLoading();
+          showToast('エラーが発生しました', true);
+          loadTodayStatus();
+        })
+        .clockIn();
+    }
+
+    // ========================================
+    // 退勤
+    // ========================================
+    function handleClockOut() {
+      document.getElementById('clockOutModal').classList.add('active');
+    }
+
+    function closeClockOutModal() {
+      document.getElementById('clockOutModal').classList.remove('active');
+    }
+
+    function confirmClockOut() {
+      closeClockOutModal();
+      document.getElementById('btnClockOut').disabled = true;
+      showLoading();
+      google.script.run
+        .withSuccessHandler(function(res) {
+          hideLoading();
+          showToast(res.message, !res.success);
+          loadTodayStatus();
+        })
+        .withFailureHandler(function(err) {
+          hideLoading();
+          showToast('エラーが発生しました', true);
+          loadTodayStatus();
+        })
+        .clockOut();
+    }
+
+    // ========================================
+    // 休憩開始
+    // ========================================
+    function handleBreakStart() {
+      document.getElementById('btnBreakStart').disabled = true;
+      showLoading();
+      google.script.run
+        .withSuccessHandler(function(res) {
+          hideLoading();
+          showToast(res.message, !res.success);
+          loadTodayStatus();
+        })
+        .withFailureHandler(function(err) {
+          hideLoading();
+          showToast('エラーが発生しました', true);
+          loadTodayStatus();
+        })
+        .breakStart();
+    }
+
+    // ========================================
+    // 休憩終了
+    // ========================================
+    function handleBreakEnd() {
+      document.getElementById('btnBreakEnd').disabled = true;
+      showLoading();
+      google.script.run
+        .withSuccessHandler(function(res) {
+          hideLoading();
+          showToast(res.message, !res.success);
+          loadTodayStatus();
+        })
+        .withFailureHandler(function(err) {
+          hideLoading();
+          showToast('エラーが発生しました', true);
+          loadTodayStatus();
+        })
+        .breakEnd();
+    }
+
+    // ========================================
+    // 日報保存
+    // ========================================
+    function handleSaveReport() {
+      var text = document.getElementById('reportText').value.trim();
+      if (!text) {
+        showToast('日報を入力してください', true);
+        return;
+      }
+      document.getElementById('btnSaveReport').disabled = true;
+      showLoading();
+      google.script.run
+        .withSuccessHandler(function(res) {
+          hideLoading();
+          document.getElementById('btnSaveReport').disabled = false;
+          showToast(res.message, !res.success);
+        })
+        .withFailureHandler(function(err) {
+          hideLoading();
+          document.getElementById('btnSaveReport').disabled = false;
+          showToast('エラーが発生しました', true);
+        })
+        .saveReport(text);
+    }
+
+    // ========================================
+    // 初期化
+    // ========================================
+    loadTodayStatus();
+  </script>
+</body>
+</html>
