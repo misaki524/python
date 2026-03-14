@@ -19,6 +19,7 @@ class RumpsTest(App):
     # インスタンス変数でタイマーとカウントを管理
     self._timer = None
     self._count = 0
+    self._paused = False
     # 通知タイマー関連
     self._notify_timer = None
     self._notify_interval = 30 * 60  # デフォルト30分（秒）
@@ -37,12 +38,14 @@ class RumpsTest(App):
     self._mi_start = MenuItem("開始", callback=self.start)
     self._mi_end = MenuItem("終了（待機中）")  # 初期状態は非活性
     self._mi_cancel = MenuItem("取り消し")
+    self._mi_pause = MenuItem("一時停止（待機中）")  # 初期状態は非活性
     self._mi_elapsed = MenuItem("経過時間")
 
     self.menu = [
       self._mi_start,
       self._mi_end,
       self._mi_cancel,
+      self._mi_pause,
       self._mi_elapsed,
       None,
       notify_menu,
@@ -106,6 +109,7 @@ class RumpsTest(App):
     """
     record("開始", "")
     self._count = 0
+    self._paused = False
     self._timer = Timer(self.pass_time, 1)
     self._timer.start()
     self.start_notify_timer()
@@ -113,32 +117,64 @@ class RumpsTest(App):
 
   def end(self, sender):
     """
-    出勤記録の終了処理。タイマー停止、メニュー状態更新、フィードバック取得。
+    出勤記録の終了処理。タイマー一時停止してフィードバック取得。
+    キャンセル/未選択時はタイマーを再開して記録中に戻る。
     """
+    # ダイアログ表示中はタイマーを一時停止
     if self._timer:
       self._timer.stop()
-    self.stop_notify_timer()
-    self._set_menu_state(recording=False)
 
     # チェックボックス風の選択UI（AppleScriptで実現）
     options = ["ITパス", "AWS関連", "code", "codeAI", "まとめ関連", "その他"]
     selected_options = self._show_checkbox_dialog(options)
     
-    if selected_options:
-      # 「その他」が含まれている場合は自由記入
-      if "その他" in selected_options:
-        free = Window(
-          message="自由にご記入ください",
-          title="フィードバック自由記入",
-          default_text="",
-          dimensions=(400, 300)
-        ).run()
-        other_text = free.text.strip() if free.text.strip() else "その他(内容未記入)"
-        selected_options = [opt for opt in selected_options if opt != "その他"] + [other_text]
-      feedback = ", ".join(selected_options)
-    else:
-      feedback = "未選択"
+    if not selected_options:
+      # キャンセルまたは未選択 → タイマー再開して記録中に戻る
+      if self._timer and not self._paused:
+        self._timer.start()
+      return
+
+    # 選択された場合のみ終了処理を実行
+    self.stop_notify_timer()
+    self._set_menu_state(recording=False)
+
+    # 「その他」が含まれている場合は自由記入
+    if "その他" in selected_options:
+      free = Window(
+        message="自由にご記入ください",
+        title="フィードバック自由記入",
+        default_text="",
+        dimensions=(400, 300)
+      ).run()
+      other_text = free.text.strip() if free.text.strip() else "その他(内容未記入)"
+      selected_options = [opt for opt in selected_options if opt != "その他"] + [other_text]
+    feedback = ", ".join(selected_options)
     record("終了", feedback)
+
+  def pause_timer(self, sender):
+    """
+    計測の一時停止。タイマーを止めるがカウントはリセットしない。
+    """
+    if self._timer:
+      self._timer.stop()
+    self._paused = True
+    self._mi_pause.set_callback(self.resume_timer)
+    self._mi_pause.title = "再開"
+    self._mi_elapsed.title = f"経過時間 {datetime.timedelta(seconds=self._count)}（一時停止中）"
+    self.icon = None
+    self.icon = "./images_start.png"
+
+  def resume_timer(self, sender):
+    """
+    計測の再開。一時停止中のカウントから継続。
+    """
+    self._paused = False
+    if self._timer:
+      self._timer.start()
+    self._mi_pause.set_callback(self.pause_timer)
+    self._mi_pause.title = "一時停止"
+    self.icon = None
+    self.icon = "./images.png"
 
   def pass_time(self, sender):
     """
@@ -169,6 +205,8 @@ class RumpsTest(App):
       self._mi_end.set_callback(self.end)
       self._mi_end.title = "終了"
       self._mi_cancel.set_callback(self.cancel)
+      self._mi_pause.set_callback(self.pause_timer)
+      self._mi_pause.title = "一時停止"
       self.icon = None
       self.icon = "./images.png"
     else:
@@ -177,7 +215,10 @@ class RumpsTest(App):
       self._mi_end.set_callback(None)
       self._mi_end.title = "終了（待機中）"
       self._mi_cancel.set_callback(self.cancel)
+      self._mi_pause.set_callback(None)
+      self._mi_pause.title = "一時停止（待機中）"
       self._mi_elapsed.title = "経過時間"
+      self._paused = False
       self.icon = None
       self.icon = "./images_start.png"
 
