@@ -1,0 +1,20 @@
+{
+    "files.associations": {
+        "*.rpy": "plaintext",
+        "*.rpyc": "plaintext"
+    },
+    "python.analysis.exclude": [
+        "**/*.rpy",
+        "game/**"
+    ],
+    "python.analysis.ignore": [
+        "**/*.rpy",
+        "game/**"
+    ],
+    "[plaintext]": {
+        "editor.quickSuggestions": false
+    },
+    "cSpell.ignorePaths": [
+        "game/**/*.rpy"
+    ]
+}
