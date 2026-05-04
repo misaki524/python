@@ -79,6 +79,25 @@ screen heavy_noise_effect():
 # ============================================================
 
 # 短い画面揺れ（衝撃演出用）
-define short_shake = Move((8, 8), (-8, -8), .05, bounce=True, repeat=True, delay=0.3)
+transform short_shake:
+    linear 0.05 offset (8, 8)
+    linear 0.05 offset (-8, -8)
+    linear 0.05 offset (8, 8)
+    linear 0.05 offset (-8, -8)
+    linear 0.05 offset (4, 4)
+    linear 0.05 offset (0, 0)
+
 # 長い画面揺れ（地震演出用）
-define long_shake = Move((12, 12), (-12, -12), .05, bounce=True, repeat=True, delay=0.8)
+transform long_shake:
+    linear 0.05 offset (12, 12)
+    linear 0.05 offset (-12, -12)
+    linear 0.05 offset (12, 12)
+    linear 0.05 offset (-12, -12)
+    linear 0.05 offset (8, 8)
+    linear 0.05 offset (-8, -8)
+    linear 0.05 offset (8, 8)
+    linear 0.05 offset (-8, -8)
+    linear 0.05 offset (4, 4)
+    linear 0.05 offset (-4, -4)
+    linear 0.05 offset (4, 4)
+    linear 0.05 offset (0, 0)

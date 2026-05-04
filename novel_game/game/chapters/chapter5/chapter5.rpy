@@ -6,6 +6,10 @@ label chapter5:
 
     call update_clue_count
 
+    # END8: 店長の秘密（2周目以降、店長メモを十分集めた場合）
+    if persistent.playthrough_count >= 1 and store_manager_notes >= 2:
+        jump ending_manager
+
     # ルート判定
     if underground:
         jump chapter5_underground
@@ -135,7 +139,7 @@ label chapter5_outside:
 
     "少女がこちらを見上げた。"
 
-    hide chara_girl
+    hide chara_girl with dissolve
 
     if found_diary and found_camera and found_girl_clue:
         "すべての真相が繋がった。"

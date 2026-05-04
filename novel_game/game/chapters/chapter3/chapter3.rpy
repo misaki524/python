@@ -52,6 +52,7 @@ label chapter3:
 
     show screen blackout
     pause 0.5
+    hide screen blackout
 
     scene bg_store_inside_dark
 

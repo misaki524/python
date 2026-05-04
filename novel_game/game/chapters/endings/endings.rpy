@@ -7,6 +7,7 @@
 label ending_dawn:
 
     $ current_time = "AM 5:00"
+    hide screen clock_display
 
     scene bg_store_front with dissolve
 
@@ -80,6 +81,7 @@ label ending_dawn:
 label ending_survivor:
 
     $ current_time = "AM 5:00"
+    hide screen clock_display
 
     scene bg_store_inside with dissolve
 
@@ -128,6 +130,7 @@ label ending_survivor:
 label ending_normal:
 
     $ current_time = "AM 5:00"
+    hide screen clock_display
 
     scene bg_store_inside with dissolve
 
@@ -180,6 +183,7 @@ label ending_normal:
 
 label ending_fog:
 
+    hide screen clock_display
     scene bg_fog
 
     "歩いている。"
@@ -219,6 +223,7 @@ label ending_fog:
 
 label ending_swap:
 
+    hide screen clock_display
     scene black with fade
 
     "受け入れた瞬間——意識が遠のいた。"
@@ -293,6 +298,7 @@ label ending_swap:
 label ending_eternal:
 
     scene bg_store_inside_dark
+    hide screen clock_display
 
     $ current_time = "AM 4:59"
 
@@ -355,6 +361,7 @@ label ending_eternal:
 label ending_predecessor:
 
     $ current_time = "AM 5:00"
+    hide screen clock_display
 
     scene bg_store_inside with dissolve
 
@@ -422,10 +429,11 @@ label ending_predecessor:
 
 label ending_manager:
 
-    # このエンディングは2周目以降、store_manager_notes >= 3で到達
-    # chapter5の通常ルートからの分岐として呼ばれる
+    # このエンディングは2周目以降、store_manager_notes >= 2で到達
+    # chapter5冒頭のルート判定から分岐
 
     $ current_time = "AM 5:00"
+    hide screen clock_display
 
     scene bg_store_inside with dissolve
 

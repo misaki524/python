@@ -39,6 +39,7 @@ label chapter2:
 
     show screen blackout
     pause 0.5
+    hide screen blackout
 
     "店内の蛍光灯が、一斉に消えた。"
 

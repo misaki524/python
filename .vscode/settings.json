@@ -1,3 +1,17 @@
 {
-  "python.analysis.typeCheckingMode": "basic"
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.exclude": [
+    "**/*.rpy",
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*"
+  ],
+  "files.associations": {
+    "*.rpy": "plaintext",
+    "*.rpyc": "plaintext"
+  },
+  "cSpell.ignorePaths": [
+    "**/*.rpy",
+    "**/novel_game/**"
+  ]
 }

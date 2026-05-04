@@ -15,6 +15,7 @@
         "editor.quickSuggestions": false
     },
     "cSpell.ignorePaths": [
-        "game/**/*.rpy"
+        "**/*.rpy",
+        "game/**"
     ]
 }

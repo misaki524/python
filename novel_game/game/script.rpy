@@ -7,7 +7,7 @@
 image bg_store_front = "images/bg/コンビニの店内.jpg"
 image bg_store_front_fog = "images/bg/霧.jpg"
 image bg_store_inside = "images/bg/コンビニの店内.jpg"
-image bg_store_inside_dark = "images/bg/コンビニの店内.jpg"
+image bg_store_inside_dark = "images/bg/コンビニの店内暗い.jpg"
 image bg_backyard = "images/bg/街中の横断歩道（夜・赤信号）.jpg"
 image bg_underground = Solid("#0a0a10")
 image bg_fog = "images/bg/霧.jpg"
@@ -26,7 +26,7 @@ image chara_hood = Solid("#00000000")
 # キャラクター定義
 # ============================================================
 
-define player_name = "安藤ユウキ"
+default player_name = "安藤ユウキ"
 define p = Character("[player_name]", color="#87ceeb")
 define suit = Character("スーツの男", color="#808080")
 define misaki = Character("ミサキ", color="#ffffff")
@@ -109,7 +109,8 @@ default persistent.playthrough_count = 0
 
 label start:
 
-    # 名前入力
+    # 名前入力（背景: コンビニ店内暗い）
+    scene bg_store_inside_dark
     $ player_name = renpy.input("名前を入力してください（空欄でデフォルト）", default="安藤ユウキ", length=12)
     $ player_name = player_name.strip()
     if player_name == "":
