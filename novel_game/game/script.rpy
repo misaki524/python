@@ -23,15 +23,29 @@ image chara_girl_smile = Solid("#00000000")
 image chara_hood = Solid("#00000000")
 
 # ============================================================
+# CTC（Click-to-Continue）インジケータ
+# ============================================================
+
+image ctc_enter:
+    Text(" Enter▼", size=16, color="#666666")
+    alpha 0.0
+    pause 0.15
+    linear 0.35 alpha 1.0
+    pause 0.4
+    linear 0.35 alpha 0.0
+    repeat
+
+# ============================================================
 # キャラクター定義
 # ============================================================
 
 default player_name = "安藤ユウキ"
-define p = Character("[player_name]", color="#87ceeb")
-define suit = Character("スーツの男", color="#808080")
-define misaki = Character("ミサキ", color="#ffffff")
-define hood = Character("???", color="#8b0000")
-define sato = Character("佐藤ケンジ", color="#ffa500")
+define narrator = Character(None, kind=nvl, ctc="ctc_enter", ctc_position="nestled")
+define p = Character("[player_name]", color="#87ceeb", kind=nvl, ctc="ctc_enter", ctc_position="nestled")
+define suit = Character("スーツの男", color="#808080", kind=nvl, ctc="ctc_enter", ctc_position="nestled")
+define misaki = Character("ミサキ", color="#ffffff", kind=nvl, ctc="ctc_enter", ctc_position="nestled")
+define hood = Character("???", color="#8b0000", kind=nvl, ctc="ctc_enter", ctc_position="nestled")
+define sato = Character("佐藤ケンジ", color="#ffa500", kind=nvl, ctc="ctc_enter", ctc_position="nestled")
 
 # ============================================================
 # ストーリーフラグ（default宣言 — Ren'Py 初回定義用）
@@ -110,11 +124,28 @@ default persistent.playthrough_count = 0
 label start:
 
     # 名前入力（背景: コンビニ店内暗い）
+    nvl clear
     scene bg_store_inside_dark
     $ player_name = renpy.input("名前を入力してください（空欄でデフォルト）", default="安藤ユウキ", length=12)
     $ player_name = player_name.strip()
     if player_name == "":
         $ player_name = "安藤ユウキ"
+
+label name_confirm:
+
+    "「[player_name]」でよろしいですか？"
+
+    menu:
+        "はい、この名前で始める":
+            jump name_confirmed
+        "いいえ、入力し直す":
+            $ player_name = renpy.input("名前を入力してください（空欄でデフォルト）", default="安藤ユウキ", length=12)
+            $ player_name = player_name.strip()
+            if player_name == "":
+                $ player_name = "安藤ユウキ"
+            jump name_confirm
+
+label name_confirmed:
 
     # 変数一括初期化（engine/flags.rpy）
     $ init_flags(GAME_FLAGS)

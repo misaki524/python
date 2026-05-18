@@ -1,0 +1,12 @@
+# Ren'Py cache & compiled scripts
+game/cache/
+game/**/*.rpyc
+
+# Save data (user-specific)
+game/saves/
+
+# Runtime logs
+log.txt
+logs/
+traceback.txt
+errors.txt

@@ -13,12 +13,12 @@ screen say(who, what):
         background Solid("#00000099")
 
         vbox:
-            xalign 0.5
-            yalign 0.5
-            spacing 10
+            xalign 0.0
+            yalign 0.0
+            spacing 6
 
             if who is not None:
-                text who id "who" style "say_label" xalign 0.5
+                text who id "who" style "say_label"
 
             text what id "what" style "say_dialogue"
 
@@ -38,18 +38,29 @@ style window:
     xfill True
     yfill True
 
+style say_window is window:
+    xalign 0.0
+    xoffset 10
+    yalign 0.0
+    yoffset 10
+    xfill False
+    yfill False
+    xsize 820
+    xpadding 20
+    ypadding 14
+
 style say_label:
     color "#87ceeb"
-    size 30
-    xalign 0.5
-    text_align 0.5
+    size 28
+    xalign 0.0
+    text_align 0.0
 
 style say_dialogue:
-    xalign 0.5
-    text_align 0.5
-    xsize 900
+    xalign 0.0
+    text_align 0.0
+    xsize 780
     color "#e0e0e0"
-    size 26
+    size 24
 
 # ============================================================
 # Input（テキスト入力）
@@ -661,15 +672,22 @@ screen nvl(dialogue, items=None):
     window:
         style "nvl_window"
 
-        has vbox:
-            spacing 15
+        viewport:
+            mousewheel True
+            draggable True
+            yinitial 1.0
 
-        use nvl_dialogue(dialogue)
+            vbox:
+                spacing 10
 
-        for i in items or []:
-            textbutton i.caption:
-                action i.action
-                style "nvl_button"
+                use nvl_dialogue(dialogue)
+
+                if items:
+                    null height 15
+                    for i in items:
+                        textbutton i.caption:
+                            action i.action
+                            style "nvl_button"
 
     add SideImage() xalign 0.0 yalign 1.0
 
@@ -677,16 +695,21 @@ screen nvl_dialogue(dialogue):
     for d in dialogue:
         window:
             id d.window_id
+            style "nvl_entry"
 
-            fixed:
-                yfit True
-
-                if d.who is not None:
+            if d.who is not None:
+                hbox:
+                    spacing 0
                     text d.who:
                         id d.who_id
-
+                        style "nvl_name"
+                    text d.what:
+                        id d.what_id
+                        style "nvl_dialogue"
+            else:
                 text d.what:
                     id d.what_id
+                    style "nvl_dialogue"
 
 style nvl_window is default
 style nvl_entry is default
@@ -700,3 +723,22 @@ style nvl_window:
     yfill True
     background "#0a0a0aDD"
     padding [30, 30, 30, 30]
+
+style nvl_entry:
+    xfill True
+    background None
+
+style nvl_name is say_label:
+    size 24
+    yalign 0.0
+
+style nvl_button:
+    xalign 0.5
+    xsize 700
+
+style nvl_button_text:
+    xalign 0.5
+    color "#aaaaaa"
+    hover_color "#cc0000"
+    size 24
+    text_align 0.5

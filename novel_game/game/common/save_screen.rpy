@@ -12,25 +12,24 @@
 
 screen save_panel():
     if not main_menu:
-        zorder 50
+        zorder 150
 
         frame:
-            xalign 0.0
-            yalign 0.5
-            xpadding 4
+            xalign 1.0
+            yalign 1.0
+            xoffset -15
+            yoffset -15
+            xpadding 24
             ypadding 14
-            background Frame(Solid("#0a0a0acc"), 3, 3, 3, 3)
+            background Frame(Solid("#2a5a99cc"), 8, 8, 8, 8)
 
-            vbox:
-                spacing 6
-
-                textbutton "保存":
-                    text_size 14
-                    text_color "#8b0000"
-                    text_hover_color "#cc0000"
-                    text_bold True
-                    xalign 0.5
-                    action ShowMenu("save")
+            textbutton "SAVE":
+                text_size 20
+                text_color "#ffffff"
+                text_hover_color "#cce0ff"
+                text_bold True
+                xalign 0.5
+                action ShowMenu("save")
 
 init python:
     config.overlay_screens.append("save_panel")

@@ -14,9 +14,11 @@
 
 # clock_display エイリアス（chapter スクリプトから呼ばれる）
 screen clock_display():
+    zorder 150
     use generic_clock("current_time", "#00ff41", 32)
 
 screen generic_clock(time_var="current_time", time_color="#00ff41", clock_size=32):
+    zorder 150
     frame:
         xalign 1.0
         yalign 0.0

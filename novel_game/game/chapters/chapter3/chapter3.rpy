@@ -4,11 +4,11 @@ label chapter3:
 
     $ current_time = "AM 2:00"
 
+    nvl clear
     scene bg_store_inside_dark with dissolve
 
-    # BGM切替（コメント。音源追加時にアンコメント）
-    # stop music fadeout 1.0
-    # play music "audio/bgm/bgm_horror.ogg" fadein 2.0
+    stop music fadeout 1.0
+    play music "audio/bgm/bgm_horror.ogg" fadein 2.0
 
     # --- シーン1: 異常の深化 ---
 
@@ -23,7 +23,7 @@ label chapter3:
     "足音は——止まっていた。"
     "棚の向こうに誰かがいたはずだが、姿は見えない。"
 
-    p "……気のせいだったのか？"
+    p "「……気のせいだったのか？」"
 
     "そう思いたかった。"
     "だが、身体は正直だ。背筋に冷たいものが走っている。"
@@ -40,7 +40,7 @@ label chapter3:
 
     "——自動ドアは、閉まったままだった。"
 
-    p "え……？　今、チャイムが——"
+    p "「え……？　今、チャイムが——」"
 
     "チャイムは確かに鳴った。だが、ドアは開いていない。"
 
@@ -50,12 +50,15 @@ label chapter3:
 
     "ゆっくりと、振り返る。"
 
+    stop music fadeout 0.3
     show screen blackout
     pause 0.5
     hide screen blackout
 
+    nvl clear
     scene bg_store_inside_dark
 
+    play music "audio/bgm/bgm_horror.ogg" fadein 1.0
     show chara_hood at center with dissolve
 
     "——いた。"
@@ -98,12 +101,13 @@ label chapter3:
 # ============================================================
 
 label chapter3_confront:
+    nvl clear
 
     $ confront_hood = True
 
     "意を決して、声をかけた。"
 
-    p "あの……お客様？　何かお探しですか？"
+    p "「あの……お客様？　何かお探しですか？」"
 
     "声が震えていないことを祈った。"
 
@@ -123,7 +127,7 @@ label chapter3_confront:
 
     "{b}自分の顔{/b}だった。"
 
-    p "——っ！！"
+    p "「——っ！！」"
 
     "後ずさる。カウンターに背中がぶつかった。"
 
@@ -142,7 +146,7 @@ label chapter3_confront:
 
     hide chara_hood with dissolve
 
-    p "……嘘だろ。今の、何だ？"
+    p "「……嘘だろ。今の、何だ？」"
 
     "心臓が痛いほど脈打っている。"
     "あれの顔が——自分の顔だった。"
@@ -155,6 +159,7 @@ label chapter3_confront:
 # ============================================================
 
 label chapter3_police:
+    nvl clear
 
     $ tried_police = True
 
@@ -173,7 +178,7 @@ label chapter3_police:
 
     "ノイズ。まるで古いラジオのような、ホワイトノイズ。"
 
-    p "繋がらない……やっぱり圏外で——"
+    p "「繋がらない……やっぱり圏外で——」"
 
     "ノイズの中に、何かが混じっていた。"
 
@@ -191,13 +196,13 @@ label chapter3_police:
 
     "{b}『タスケテ』{/b}"
 
-    p "——！"
+    p "「——！」"
 
     "画面が真っ暗になり、スマートフォンの電源が落ちた。"
 
     "何度電源ボタンを押しても、反応しない。"
 
-    p "嘘だろ……"
+    p "「嘘だろ……」"
 
     "完全に孤立した。"
     "外部への連絡手段は断たれた。"
@@ -217,6 +222,7 @@ label chapter3_police:
 # ============================================================
 
 label chapter3_observe:
+    nvl clear
 
     $ observed_hood = True
 
@@ -263,7 +269,7 @@ label chapter3_observe:
 
     hide chara_hood with dissolve
 
-    p "壁の中に……？"
+    p "「壁の中に……？」"
 
     "カウンターの下から這い出る。"
     "壁を触ってみた。固い。普通の壁だ。"
@@ -272,7 +278,7 @@ label chapter3_observe:
 
     "だが今、確かにあの人物は壁の中に消えた。"
 
-    p "この店の壁の向こうに……何かある？"
+    p "「この店の壁の向こうに……何かある？」"
 
     jump chapter3_after
 
@@ -284,6 +290,7 @@ label chapter3_after:
 
     $ current_time = "AM 2:30"
 
+    nvl clear
     scene bg_store_inside_dark
 
     "午前2時30分。"
@@ -298,7 +305,7 @@ label chapter3_after:
 
     "まるで何かが中から叩いているような音。"
 
-    p "……開けたくない。"
+    p "「……開けたくない。」"
 
     "だが、冷蔵庫の方に目をやると——"
 
@@ -309,10 +316,11 @@ label chapter3_after:
 
     "『ニ ゲ テ』"
 
+    play music "audio/bgm/bgm_crisis.ogg" fadein 0.5
     show screen heavy_noise_effect
     pause 0.2
 
-    p "……っ！"
+    p "「……っ！」"
 
     "動かなければ。"
     "このままここにいてはいけない——本能がそう叫んでいる。"
@@ -326,7 +334,7 @@ label chapter3_after:
     if trust_suit:
         "スーツの男の言葉が頭をよぎる。"
         "{i}「3時を過ぎると、もう戻れなくなる。」{/i}"
-        p "戻れなくなる……それが本当だとしたら——"
+        p "「戻れなくなる……それが本当だとしたら——」"
 
     "あと5分。"
     "何をするか、決めなければいけない——"

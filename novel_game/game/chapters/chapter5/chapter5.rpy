@@ -28,6 +28,7 @@ label chapter5:
 
 label chapter5_underground:
 
+    nvl clear
     scene bg_underground
 
     "もう一人の自分が——目の前に立っている。"
@@ -40,7 +41,7 @@ label chapter5_underground:
 
     "「ずっと待っていた。」"
 
-    p "お前は……何だ？"
+    p "「お前は……何だ？」"
 
     "「お前だよ。境界の向こう側のお前だ。」"
 
@@ -48,7 +49,7 @@ label chapter5_underground:
     "「毎年この時期に、向こう側とこちら側が重なる。」"
     "「俺は向こう側で、ずっとお前を見ていた。」"
 
-    p "向こう側……？"
+    p "「向こう側……？」"
 
     "「こちら側に来たい。お前の場所に、お前の代わりに立ちたい。」"
 
@@ -62,7 +63,7 @@ label chapter5_underground:
         "拒絶する":
             $ accepted_doppelganger = False
 
-            p "断る。ここは俺の場所だ。"
+            p "「断る。ここは俺の場所だ。」"
 
             "もう一人の自分が、悲しそうに微笑んだ。"
 
@@ -72,7 +73,7 @@ label chapter5_underground:
 
             "「ただし——あの子のことは、頼む。」"
 
-            p "あの子……ミサキちゃんのことか？"
+            p "「あの子……ミサキちゃんのことか？」"
 
             "返事はなかった。影は消え、地下倉庫には自分一人が残された。"
 
@@ -82,18 +83,19 @@ label chapter5_underground:
             if found_diary and found_camera and found_girl_clue:
                 "地下から店内に戻ると——そこに少女が立っていた。"
 
+                nvl clear
                 scene bg_store_inside_dark with dissolve
                 show chara_girl at center with dissolve
 
-                misaki "お兄さん。全部知ったんだね。"
+                misaki "「お兄さん。全部知ったんだね。」"
 
-                p "ミサキちゃん……君は30年前に——"
+                p "「ミサキちゃん……君は30年前に——」"
 
-                misaki "うん。もう、分かってる。"
+                misaki "「うん。もう、分かってる。」"
 
                 "少女の目に涙が浮かんでいた。"
 
-                misaki "助けて。わたしを、ここから出して。"
+                misaki "「助けて。わたしを、ここから出して。」"
 
                 jump chapter5_ritual
 
@@ -109,13 +111,14 @@ label chapter5_underground:
 
 label chapter5_outside:
 
+    nvl clear
     scene bg_fog with dissolve
 
     "少女に導かれ、霧の中を歩く。"
 
     show chara_girl at center
 
-    misaki "もうすぐだよ。"
+    misaki "「もうすぐだよ。」"
 
     "少女の足取りは迷いがない。"
     "霧の中に、何か見える——"
@@ -123,19 +126,19 @@ label chapter5_outside:
     "古びた家の輪郭。"
     "もう存在しないはずの——30年前の小さな家。"
 
-    p "これは……"
+    p "「これは……」"
 
-    misaki "わたしの家。"
+    misaki "「わたしの家。」"
 
     "霧の中に浮かぶ幻影。だが少女には確かに見えている。"
 
-    misaki "ここでお母さんと暮らしてたの。"
-    misaki "ある日、知らない場所に来ちゃって……ずっと、帰れなかった。"
+    misaki "「ここでお母さんと暮らしてたの。」"
+    misaki "「ある日、知らない場所に来ちゃって……ずっと、帰れなかった。」"
 
-    p "ミサキちゃん……"
+    p "「ミサキちゃん……」"
 
-    misaki "お兄さんは、わたしのこと分かってくれたよね。"
-    misaki "わたしが何か、分かってくれた。"
+    misaki "「お兄さんは、わたしのこと分かってくれたよね。」"
+    misaki "「わたしが何か、分かってくれた。」"
 
     "少女がこちらを見上げた。"
 
@@ -152,11 +155,11 @@ label chapter5_outside:
         "だが、自分には全貌が見えていない。"
         "少女を助ける方法も、この霧を晴らす方法も分からない。"
 
-        misaki "いいの。会えただけで……嬉しかった。"
+        misaki "「いいの。会えただけで……嬉しかった。」"
 
         "少女の姿が薄れていく。"
 
-        misaki "朝が来れば、お兄さんは帰れるよ。"
+        misaki "「朝が来れば、お兄さんは帰れるよ。」"
 
         "光が——東の方角から差し始めた。"
         "霧がゆっくりと晴れていく。"
@@ -169,6 +172,7 @@ label chapter5_outside:
 
 label chapter5_sato:
 
+    nvl clear
     scene bg_store_inside_dark with dissolve
 
     $ current_time = "AM 4:00"
@@ -176,24 +180,24 @@ label chapter5_sato:
     "佐藤と二人、カウンターの中にいる。"
 
     if showed_diary_to_sato:
-        sato "田中の日記をもう一度読もう。何か見落としてるかもしれない。"
+        sato "「田中の日記をもう一度読もう。何か見落としてるかもしれない。」"
 
         "佐藤が日記の続きを読み始める。"
 
         $ diary_pages_read += 1
 
-        sato "ここ、見ろよ。"
+        sato "「ここ、見ろよ。」"
 
         "{i}10月28日{/i}"
         "{i}分かった。あの子——ミサキを助ける方法がある。{/i}"
         "{i}地下に行く。あの子を助けなきゃ。{/i}"
         "{i}佐藤、もし俺が戻ってこなかったら——ごめん。{/i}"
 
-        sato "……田中。"
+        sato "「……田中。」"
 
         "佐藤が目を伏せた。"
 
-        sato "あいつは、最後まで誰かを助けようとしてたんだな。"
+        sato "「あいつは、最後まで誰かを助けようとしてたんだな。」"
 
         "不意に——店の奥から声が聞こえた。"
 
@@ -201,36 +205,36 @@ label chapter5_sato:
 
         "「こっちに来るな。」"
 
-        sato "——っ！　田中！？"
+        sato "「——っ！　田中！？」"
 
-        p "今の声……"
+        p "「今の声……」"
 
         "「でも……あの子を頼む。」"
 
         "声はそれ以上続かなかった。"
         "だが——田中は生きている。どこかで。"
 
-        sato "田中……お前、まだ……"
+        sato "「田中……お前、まだ……」"
 
         "佐藤の目に涙が浮かんでいた。"
 
         # 儀式条件チェック
         if found_diary and found_girl_clue and found_camera:
-            sato "……日記に書いてある方法、試してみないか。"
-            sato "あの子を——ミサキを助ける儀式。"
-            sato "田中も、それをやろうとしてたんだ。"
+            sato "「……日記に書いてある方法、試してみないか。」"
+            sato "「あの子を——ミサキを助ける儀式。」"
+            sato "「田中も、それをやろうとしてたんだ。」"
 
             jump chapter5_ritual
         else:
-            sato "俺たちに今できることは……田中の意志を継ぐことだ。"
-            sato "あの子を助ける方法を、いつか必ず見つけよう。"
+            sato "「俺たちに今できることは……田中の意志を継ぐことだ。」"
+            sato "「あの子を助ける方法を、いつか必ず見つけよう。」"
 
             "夜が——明け始めていた。"
 
             jump ending_predecessor
 
     else:
-        sato "なんとか朝まで耐えるしかないな。"
+        sato "「なんとか朝まで耐えるしかないな。」"
 
         "佐藤がいるだけで、少しだけ安心できた。"
         "二人でカウンターの中に陣取り、朝を待つ。"
@@ -249,11 +253,11 @@ label chapter5_sato:
         "蛍光灯が安定し始めた。"
         "冷蔵庫の異音が収まる。"
 
-        sato "……なんか、静かになってきたな。"
+        sato "「……なんか、静かになってきたな。」"
 
         "窓の外を見る。霧が——薄くなっている。"
 
-        sato "朝だ。夜が明ける。"
+        sato "「朝だ。夜が明ける。」"
 
         if clue_count >= 2:
             jump ending_survivor
@@ -266,8 +270,12 @@ label chapter5_sato:
 
 label chapter5_ritual:
 
+    nvl clear
     scene bg_store_inside_dark with dissolve
     $ current_time = "AM 4:30"
+
+    stop music fadeout 1.0
+    play music "audio/bgm/bgm_ending_good.ogg" fadein 2.0
 
     "全ての手がかりが一つに繋がった。"
 
@@ -278,20 +286,20 @@ label chapter5_ritual:
 
     "そして——田中の日記に記されていた方法。"
 
-    p "ミサキちゃんの魂を解放すれば、境界は閉じる。"
+    p "「ミサキちゃんの魂を解放すれば、境界は閉じる。」"
 
     if called_sato:
-        sato "やろう。田中にもできなかったことを——俺たちで。"
+        sato "「やろう。田中にもできなかったことを——俺たちで。」"
 
     show chara_girl at center with dissolve
 
-    misaki "お兄さん……。"
+    misaki "「お兄さん……。」"
 
-    p "ミサキちゃん。君を家に帰すよ。"
+    p "「ミサキちゃん。君を家に帰すよ。」"
 
-    misaki "……本当に？"
+    misaki "「……本当に？」"
 
-    p "約束する。"
+    p "「約束する。」"
 
     "日記に書かれた通りに——"
     "地下から持ち出した30年前の遺品を、カウンターの上に並べる。"
@@ -301,7 +309,7 @@ label chapter5_ritual:
     "それは——母親からもらった小さなお守りだった。"
     "地下の木箱の底に、ずっと眠っていた。"
 
-    misaki "……これ。おかあさんの。"
+    misaki "「……これ。おかあさんの。」"
 
     "少女がお守りを手に取る。"
     "その瞬間——店内が、白い光に包まれた。"
@@ -314,9 +322,9 @@ label chapter5_ritual:
 
             show chara_girl_smile at center with dissolve
 
-            misaki "ありがとう。ありがとう、お兄さん。"
+            misaki "「ありがとう。ありがとう、お兄さん。」"
 
-            misaki "もう大丈夫。わたし、帰れるよ。"
+            misaki "「もう大丈夫。わたし、帰れるよ。」"
 
             "少女が微笑んだ。"
             "初めて見る、穏やかな笑顔だった。"
@@ -325,7 +333,7 @@ label chapter5_ritual:
 
             "少女の姿が、光の中に溶けていく。"
 
-            misaki "おかあさんのところに……帰るね。"
+            misaki "「おかあさんのところに……帰るね。」"
 
             hide chara_girl_smile with dissolve
 
@@ -336,22 +344,22 @@ label chapter5_ritual:
             "店内には、自分だけが残されていた。"
 
             if called_sato:
-                sato "……行ったか。"
-                sato "あの子、笑ってたな。"
-                p "ああ……笑ってた。"
+                sato "「……行ったか。」"
+                sato "「あの子、笑ってたな。」"
+                p "「ああ……笑ってた。」"
 
             jump ending_dawn
 
         "儀式を中断する":
             $ ritual_success = False
 
-            p "……ごめん。これが正しいのか、確信が持てない。"
+            p "「……ごめん。これが正しいのか、確信が持てない。」"
 
-            misaki "……いいの。無理しないで。"
+            misaki "「……いいの。無理しないで。」"
 
             "少女がお守りを胸に抱きしめた。"
 
-            misaki "いつか……いつか迎えに来てくれたら嬉しいな。"
+            misaki "「いつか……いつか迎えに来てくれたら嬉しいな。」"
 
             hide chara_girl with dissolve
 

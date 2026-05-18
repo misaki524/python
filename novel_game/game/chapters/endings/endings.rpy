@@ -9,6 +9,10 @@ label ending_dawn:
     $ current_time = "AM 5:00"
     hide screen clock_display
 
+    stop music fadeout 1.5
+    play music "audio/bgm/bgm_ending_good.ogg" fadein 3.0
+
+    nvl clear
     scene bg_store_front with dissolve
 
     "——午前5時。"
@@ -21,13 +25,14 @@ label ending_dawn:
 
     "コンビニの看板が、いつも通りの光を放っている。"
 
+    nvl clear
     scene bg_store_inside with dissolve
 
     "店内は——何事もなかったかのように、元に戻っていた。"
     "棚の商品は整然と並び、蛍光灯は安定している。"
     "冷蔵庫は静かに唸っている。いつも通りの音で。"
 
-    p "……終わったのか。"
+    p "「……終わったのか。」"
 
     "カウンターの上に、小さな花が一輪置かれていた。"
     "白い、名前も知らない花。"
@@ -40,30 +45,30 @@ label ending_dawn:
 
     "もう、ここにはいない声。"
 
-    p "……ミサキちゃん。"
+    p "「……ミサキちゃん。」"
 
     "窓の外を見た。朝日が、世界を金色に染めている。"
 
     "長かった夜が、ようやく終わった。"
 
     if called_sato:
-        sato "……なあ。"
-        sato "田中は——あっちで、元気でやってると思うか？"
-        p "ああ。きっとな。"
-        sato "そうだよな。あいつのことだから、向こうでも誰か助けてんだろ。"
+        sato "「……なあ。」"
+        sato "「田中は——あっちで、元気でやってると思うか？」"
+        p "「ああ。きっとな。」"
+        sato "「そうだよな。あいつのことだから、向こうでも誰か助けてんだろ。」"
 
     "自動ドアが開き、朝の日勤スタッフが出勤してくる。"
 
     "「おはようございます。お疲れさまでした。」"
 
-    p "……お疲れさまでした。"
+    p "「……お疲れさまでした。」"
 
     "エプロンを外し、更衣室に向かう。"
     "外に出ると、秋の朝の冷たい空気が頬を撫でた。"
 
     "空を見上げる。雲一つない、澄んだ青空。"
 
-    p "……帰ろう。"
+    p "「……帰ろう。」"
 
     "夜明け。"
     "全ての夜に、必ず朝は来る。"
@@ -83,6 +88,10 @@ label ending_survivor:
     $ current_time = "AM 5:00"
     hide screen clock_display
 
+    stop music fadeout 1.5
+    play music "audio/bgm/bgm_ending_good.ogg" fadein 3.0
+
+    nvl clear
     scene bg_store_inside with dissolve
 
     "午前5時。"
@@ -92,7 +101,7 @@ label ending_survivor:
 
     "生き延びた。"
 
-    p "……朝だ。"
+    p "「……朝だ。」"
 
     "身体中から力が抜ける。"
     "膝が崩れそうになるのを、カウンターに手をついて耐える。"
@@ -103,7 +112,7 @@ label ending_survivor:
 
     "小さな白い花。一輪だけ、棚に置かれている。"
 
-    p "これは……"
+    p "「これは……」"
 
     "少女が残したもの——だろうか。"
 
@@ -132,6 +141,10 @@ label ending_normal:
     $ current_time = "AM 5:00"
     hide screen clock_display
 
+    stop music fadeout 1.5
+    play music "audio/bgm/bgm_ambient.ogg" fadein 3.0
+
+    nvl clear
     scene bg_store_inside with dissolve
 
     "午前5時。"
@@ -149,7 +162,7 @@ label ending_normal:
 
     "「おはようございます！　あれ、顔色悪いですね。大丈夫ですか？」"
 
-    p "あー……いや、大丈夫。ちょっと眠くて。"
+    p "「あー……いや、大丈夫。ちょっと眠くて。」"
 
     "何があったか、思い出せない。"
     "霧が出ていた気がする。変な客が来た気がする。"
@@ -184,6 +197,9 @@ label ending_normal:
 label ending_fog:
 
     hide screen clock_display
+    stop music fadeout 1.0
+    play music "audio/bgm/bgm_ending_bad.ogg" fadein 2.0
+    nvl clear
     scene bg_fog
 
     "歩いている。"
@@ -200,7 +216,7 @@ label ending_fog:
     "走って近づこうとする。だが、辿り着けない。"
     "光は逃げるように遠ざかり、やがて霧の中に消える。"
 
-    p "……帰れない。"
+    p "「……帰れない。」"
 
     "自分がいつからここにいるのか。"
     "自分が誰だったのか。"
@@ -224,6 +240,9 @@ label ending_fog:
 label ending_swap:
 
     hide screen clock_display
+    stop music fadeout 1.0
+    play music "audio/bgm/bgm_ending_bad.ogg" fadein 2.0
+    nvl clear
     scene black with fade
 
     "受け入れた瞬間——意識が遠のいた。"
@@ -233,12 +252,13 @@ label ending_swap:
 
     "目が覚めた。"
 
+    nvl clear
     scene bg_store_inside with dissolve
 
     "蛍光灯の光が眩しい。"
     "カウンターの上に突っ伏して寝ていたらしい。"
 
-    p "……朝？"
+    p "「……朝？」"
 
     "時計を見る。午前5時。"
     "外は明るい。霧は消えている。"
@@ -254,13 +274,13 @@ label ending_swap:
     "目の色が、少し違う。"
     "いつもより深い。暗い。"
 
-    p "……？"
+    p "「……？」"
 
     "鏡に映る自分が、微笑んだ。"
 
     "自分は——微笑んでいない。"
 
-    p "——は？"
+    p "「——は？」"
 
     "鏡の中の自分が動く。こちらとは違う動きで。"
 
@@ -297,8 +317,10 @@ label ending_swap:
 
 label ending_eternal:
 
+    nvl clear
     scene bg_store_inside_dark
     hide screen clock_display
+    stop music fadeout 2.0
 
     $ current_time = "AM 4:59"
 
@@ -315,7 +337,7 @@ label ending_eternal:
     "1時間経った——いや、経っていないのかもしれない。"
     "時間が進まない。"
 
-    p "なんで……なんでだよ。"
+    p "「なんで……なんでだよ。」"
 
     "蛍光灯が消えた。"
     "冷蔵庫も止まった。"
@@ -363,34 +385,38 @@ label ending_predecessor:
     $ current_time = "AM 5:00"
     hide screen clock_display
 
+    stop music fadeout 1.5
+    play music "audio/bgm/bgm_ending_good.ogg" fadein 3.0
+
+    nvl clear
     scene bg_store_inside with dissolve
 
     "午前5時。夜が明ける。"
 
     "霧が晴れていく。朝の光が差し込んでくる。"
 
-    sato "……なあ。"
+    sato "「……なあ。」"
 
-    p "何だ？"
+    p "「何だ？」"
 
-    sato "田中はさ、向こうに行っちまったんだな。"
-    sato "あの子を——ミサキを助けようとして。"
+    sato "「田中はさ、向こうに行っちまったんだな。」"
+    sato "「あの子を——ミサキを助けようとして。」"
 
-    p "ああ。"
+    p "「ああ。」"
 
-    sato "馬鹿だよ、あいつは。一人で行くなんて。"
+    sato "「馬鹿だよ、あいつは。一人で行くなんて。」"
 
     "佐藤がポケットから何かを取り出した。"
     "古い写真。佐藤と田中が写っている。"
 
-    sato "こいつとは高校からの付き合いでさ。"
-    sato "昔っから、困ってる奴を放っておけない奴だった。"
+    sato "「こいつとは高校からの付き合いでさ。」"
+    sato "「昔っから、困ってる奴を放っておけない奴だった。」"
 
     "佐藤が田中の日記を見下ろす。"
 
-    sato "日記の最後のページ……読んだか？"
+    sato "「日記の最後のページ……読んだか？」"
 
-    p "最後の……？"
+    p "「最後の……？」"
 
     "田中の日記の最後のページを開く。"
 
@@ -403,17 +429,17 @@ label ending_predecessor:
     "{i}この店は——特別な場所だ。{/i}"
     "{i}誰かが、見守っていなきゃいけない。{/i}"
 
-    sato "田中は今も、向こうでミサキを守ってるんだろうな。"
+    sato "「田中は今も、向こうでミサキを守ってるんだろうな。」"
 
-    p "……きっとそうだ。"
+    p "「……きっとそうだ。」"
 
-    sato "なら——俺たちの仕事は、こっちを守ることだ。"
+    sato "「なら——俺たちの仕事は、こっちを守ることだ。」"
 
     "佐藤が手を差し出した。"
 
-    sato "次に霧が出た夜は、一緒に来る。約束だ。"
+    sato "「次に霧が出た夜は、一緒に来る。約束だ。」"
 
-    p "……ああ、約束だ。"
+    p "「……ああ、約束だ。」"
 
     "二人で手を握った。"
 
@@ -435,6 +461,10 @@ label ending_manager:
     $ current_time = "AM 5:00"
     hide screen clock_display
 
+    stop music fadeout 1.5
+    play music "audio/bgm/bgm_ending_good.ogg" fadein 3.0
+
+    nvl clear
     scene bg_store_inside with dissolve
 
     "午前5時。夜が明ける。"
@@ -443,7 +473,7 @@ label ending_manager:
 
     "カウンターの裏に、見覚えのない封筒が置かれていた。"
 
-    p "これは……店長の字だ。"
+    p "「これは……店長の字だ。」"
 
     "封筒を開けると、便箋が一枚。"
 
@@ -457,7 +487,7 @@ label ending_manager:
     "{i}「俺はもう歳だ。次の番人を探していた。」{/i}"
     "{i}「お前は——適任だと思う。」{/i}"
 
-    p "番人……"
+    p "「番人……」"
 
     "手紙の最後にはこう書かれていた。"
 
@@ -478,11 +508,11 @@ label ending_manager:
     "「また来月——いや、今度は昼間に会おう。」"
     "「話すことが山ほどある。」"
 
-    p "……店長。一つだけ聞いていいですか。"
+    p "「……店長。一つだけ聞いていいですか。」"
 
     "「なんだ。」"
 
-    p "田中さんのことは、知ってたんですか。"
+    p "「田中さんのことは、知ってたんですか。」"
 
     "沈黙。そして——"
 
@@ -496,7 +526,7 @@ label ending_manager:
     "看板の裏側に——古い紋様が刻まれているのが見えた。"
     "今まで気づかなかった。いや、見えていなかっただけだ。"
 
-    p "番人、か。"
+    p "「番人、か。」"
 
     "新しい朝が始まる。"
     "だが——夜の物語は、まだ終わっていない。"
