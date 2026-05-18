@@ -1,16 +1,16 @@
-2026-05-03 08:43:11 UTC
+2026-05-18 14:05:59 UTC
 macOS-26.4.1-arm64-arm-64bit
 Ren'Py 8.3.7.25031702
 
-Early init took 0.04s
+Early init took 0.03s
 Loading error handling took 0.02s
-Loading script took 0.16s
+Loading script took 0.11s
 Loading save slot metadata took 0.02s
 Loading persistent took 0.00s
 Running init code took 0.02s
 Loading analysis data took 0.01s
 Analyze and compile ATL took 0.00s
-Reloading save slot metadata took 0.01s
+Reloading save slot metadata took 0.02s
 Index archives took 0.00s
 Backing up script files to '/Users/kikuchi/Library/RenPy/backups/novel_game':
 Dump and make backups took 0.00s
@@ -25,11 +25,11 @@ Build styles took 0.00s
 Load screen analysis took 0.00s
 Analyze screens took 0.01s
 Save screen analysis took 0.01s
-Prepare screens took 0.03s
-Save pyanalysis. took 0.01s
+Prepare screens took 0.04s
+Save pyanalysis. took 0.00s
 Save bytecode. took 0.02s
 Running _start took 0.00s
-Interface start took 2.55s
+Interface start took 0.36s
 
 Initializing gl2 renderer:
 primary display bounds: (0, 0, 1440, 900)
@@ -39,13 +39,5 @@ Vendor: "b'Apple'"
 Renderer: b'Apple M1'
 Version: b'2.1 Metal - 90.5'
 Display Info: None
-Screen sizes: virtual=(1280, 720) physical=(1280, 720) drawable=(2560, 1440)
-Maximum texture size: 4096x4096
 Screen sizes: virtual=(1280, 720) physical=(1280, 720) drawable=(1280, 720)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1280, 720) physical=(1280, 720) drawable=(2560, 1440)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1280, 720) physical=(1280, 720) drawable=(1280, 720)
-Maximum texture size: 4096x4096
-Screen sizes: virtual=(1280, 720) physical=(1280, 720) drawable=(2560, 1440)
 Maximum texture size: 4096x4096

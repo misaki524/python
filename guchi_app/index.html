@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="愚痴アプリ">
+  <title>愚痴アプリ</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+      min-height: 100vh;
+      padding-bottom: 70px;
+    }
+
+    /* ========================================
+       ヘッダー
+       ======================================== */
+    .header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 20px 16px 16px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .header-date {
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    /* ========================================
+       ボトムタブバー
+       ======================================== */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      z-index: 100;
+    }
+
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      cursor: pointer;
+      color: #999;
+      font-size: 10px;
+      -webkit-tap-highlight-color: transparent;
+      transition: color 0.15s;
+    }
+
+    .tab-item.active {
+      color: #667eea;
+    }
+
+    .tab-icon {
+      font-size: 22px;
+    }
+
+    /* ========================================
+       タブコンテンツ
+       ======================================== */
+    .tab-content {
+      display: none;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ========================================
+       カード
+       ======================================== */
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      color: #333;
+    }
+
+    /* ========================================
+       感情タグピル
+       ======================================== */
+    .emotion-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .emotion-pill {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 2px solid;
+      background: white;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .emotion-pill[data-emotion="怒り"]    { border-color: #f44336; color: #f44336; }
+    .emotion-pill[data-emotion="悲しみ"]  { border-color: #2196F3; color: #2196F3; }
+    .emotion-pill[data-emotion="ストレス"] { border-color: #FF9800; color: #FF9800; }
+    .emotion-pill[data-emotion="疲れ"]   { border-color: #9C27B0; color: #9C27B0; }
+    .emotion-pill[data-emotion="不安"]   { border-color: #009688; color: #009688; }
+
+    .emotion-pill.selected[data-emotion="怒り"]    { background: #f44336; color: white; }
+    .emotion-pill.selected[data-emotion="悲しみ"]  { background: #2196F3; color: white; }
+    .emotion-pill.selected[data-emotion="ストレス"] { background: #FF9800; color: white; }
+    .emotion-pill.selected[data-emotion="疲れ"]   { background: #9C27B0; color: white; }
+    .emotion-pill.selected[data-emotion="不安"]   { background: #009688; color: white; }
+
+    /* ========================================
+       テキストエリア
+       ======================================== */
+    .guchi-textarea {
+      width: 100%;
+      min-height: 130px;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .guchi-textarea:focus {
+      border-color: #667eea;
+    }
+
+    .guchi-textarea::placeholder {
+      color: #bbb;
+    }
+
+    /* ========================================
+       送信ボタン
+       ======================================== */
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      cursor: pointer;
+      margin-top: 14px;
+      transition: opacity 0.2s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-submit:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ========================================
+       AIレスポンスカード
+       ======================================== */
+    .ai-response-card {
+      display: none;
+      background: rgba(102, 126, 234, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 16px;
+      animation: slideDown 0.3s ease;
+    }
+
+    .ai-response-card.show {
+      display: block;
+    }
+
+    .ai-response-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .ai-response-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #444;
+    }
+
+    .save-confirm {
+      font-size: 12px;
+      color: #4CAF50;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========================================
+       日記タブ
+       ======================================== */
+    .date-separator {
+      font-size: 13px;
+      font-weight: 600;
+      color: #999;
+      margin: 16px 0 8px;
+    }
+
+    .entry-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .entry-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .entry-tag-pill {
+      padding: 3px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .entry-time {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .entry-content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #333;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    .entry-content.expanded {
+      -webkit-line-clamp: unset;
+      display: block;
+    }
+
+    .entry-expand-btn {
+      font-size: 12px;
+      color: #667eea;
+      cursor: pointer;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .entry-ai {
+      background: rgba(102,126,234,0.07);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    .entry-ai-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 4px;
+    }
+
+    .entry-delete-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+      opacity: 0.5;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .entry-delete-btn:hover {
+      opacity: 1;
+    }
+
+    .load-more-btn {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #667eea;
+      border-radius: 12px;
+      background: white;
+      color: #667eea;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .empty-diary {
+      text-align: center;
+      padding: 48px 16px;
+      color: #bbb;
+      font-size: 14px;
+    }
+
+    .empty-diary-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    /* entry card fade-out animation */
+    .entry-card.removing {
+      animation: fadeOut 0.3s ease forwards;
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; transform: scale(0.95); }
+    }
+
+    /* ========================================
+       グラフタブ
+       ======================================== */
+    .period-pills {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .period-pill {
+      padding: 6px 18px;
+      border-radius: 20px;
+      border: 2px solid #667eea;
+      background: white;
+      color: #667eea;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .period-pill.selected {
+      background: #667eea;
+      color: white;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      height: 200px;
+      margin-bottom: 8px;
+    }
+
+    .chart-label {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 12px;
+    }
+
+    .summary-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .summary-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 14px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+
+    .summary-label {
+      color: #999;
+    }
+
+    .summary-value {
+      font-weight: 600;
+    }
+
+    /* ========================================
+       トースト
+       ======================================== */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #333;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: pre-line;
+      text-align: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      max-width: 90vw;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast.error {
+      background: #f44336;
+    }
+
+    /* ========================================
+       削除確認モーダル
+       ======================================== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 900;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 20px;
+      padding: 28px 24px 20px;
+      width: 300px;
+      max-width: 85vw;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+      animation: modalSlideUp 0.25s ease;
+    }
+
+    .modal-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .modal-message {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 22px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px 8px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .modal-btn:active {
+      transform: scale(0.96);
+    }
+
+    .modal-btn-cancel {
+      background: #f0f0f0;
+      color: #666;
+    }
+
+    .modal-btn-confirm {
+      background: linear-gradient(135deg, #f44336, #e91e63);
+      color: white;
+    }
+
+    /* ========================================
+       ローディング
+       ======================================== */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.5);
+      z-index: 500;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #e0e0e0;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes modalSlideUp {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <div class="header">
+    <h1>💬 愚痴アプリ</h1>
+    <div class="header-date" id="headerDate">-</div>
+  </div>
+
+  <!-- ========================================
+       Tab 1: 書く
+       ======================================== -->
+  <div class="tab-content active" id="tab-write">
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">今日の気持ち</div>
+
+      <div class="emotion-pills" id="emotionPills">
+        <button class="emotion-pill" data-emotion="怒り" onclick="selectEmotion(this)">怒り</button>
+        <button class="emotion-pill" data-emotion="悲しみ" onclick="selectEmotion(this)">悲しみ</button>
+        <button class="emotion-pill" data-emotion="ストレス" onclick="selectEmotion(this)">ストレス</button>
+        <button class="emotion-pill" data-emotion="疲れ" onclick="selectEmotion(this)">疲れ</button>
+        <button class="emotion-pill" data-emotion="不安" onclick="selectEmotion(this)">不安</button>
+      </div>
+
+      <textarea class="guchi-textarea" id="guchiText" placeholder="何があったか話して...（誰にも見せません）"></textarea>
+
+      <button class="btn-submit" id="btnSubmit" onclick="handleSubmit()">確定</button>
+    </div>
+
+    <div class="ai-response-card" id="aiResponseCard">
+      <div class="ai-response-header">
+        <span>🤖</span>
+        <span>AIからのひとこと</span>
+      </div>
+      <div class="ai-response-text" id="aiResponseText"></div>
+      <div class="save-confirm">✓ 保存しました</div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       Tab 2: 日記
+       ======================================== -->
+  <div class="tab-content" id="tab-diary">
+    <div id="diaryList" style="margin-top:16px;"></div>
+    <button class="load-more-btn" id="loadMoreBtn" onclick="loadMoreEntries()" style="display:none;">もっと見る</button>
+  </div>
+
+  <!-- ========================================
+       Tab 3: グラフ
+       ======================================== -->
+  <div class="tab-content" id="tab-chart">
+    <div style="margin-top:16px;">
+      <div class="period-pills">
+        <button class="period-pill selected" data-days="7" onclick="selectPeriod(this)">7日</button>
+        <button class="period-pill" data-days="14" onclick="selectPeriod(this)">14日</button>
+        <button class="period-pill" data-days="30" onclick="selectPeriod(this)">30日</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">気持ちのトレンド</div>
+        <div class="chart-label">Y軸: 😡怒り  😢悲しみ  😰不安  😤ストレス  😴疲れ</div>
+        <div class="chart-wrapper">
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+
+      <div class="summary-card" id="summaryCard">
+        <div class="summary-title">まとめ</div>
+        <div class="summary-row">
+          <span class="summary-label">合計</span>
+          <span class="summary-value" id="summaryTotal">-</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">一番多い気持ち</span>
+          <span class="summary-value" id="summaryTopEmotion">-</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">最も多かった日</span>
+          <span class="summary-value" id="summaryBusiestDay">-</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">感情の内訳</div>
+        <div class="chart-wrapper">
+          <canvas id="doughnutChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ボトムタブバー -->
+  <div class="tab-bar">
+    <div class="tab-item active" id="tabBtn-write" onclick="switchTab('write')">
+      <span class="tab-icon">✏️</span>
+      <span>書く</span>
+    </div>
+    <div class="tab-item" id="tabBtn-diary" onclick="switchTab('diary')">
+      <span class="tab-icon">📖</span>
+      <span>日記</span>
+    </div>
+    <div class="tab-item" id="tabBtn-chart" onclick="switchTab('chart')">
+      <span class="tab-icon">📊</span>
+      <span>グラフ</span>
+    </div>
+  </div>
+
+  <!-- 削除確認モーダル -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+      <div class="modal-icon">🗑️</div>
+      <div class="modal-title">削除しますか？</div>
+      <div class="modal-message">この愚痴を削除します</div>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">キャンセル</button>
+        <button class="modal-btn modal-btn-confirm" onclick="confirmDelete()">削除する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- トースト -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ローディング -->
+  <div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <script>
+    // ========================================
+    // 定数
+    // ========================================
+    var EMOTION_COLORS = {
+      '怒り':    '#f44336',
+      '悲しみ':  '#2196F3',
+      'ストレス': '#FF9800',
+      '疲れ':   '#9C27B0',
+      '不安':   '#009688'
+    };
+
+    var EMOTION_EMOJI = {
+      '怒り': '😡', '悲しみ': '😢', 'ストレス': '😤', '疲れ': '😴', '不安': '😰'
+    };
+    var EMOTION_LABELS = ['怒り', '悲しみ', '不安', 'ストレス', '疲れ'];
+
+    // ========================================
+    // 状態
+    // ========================================
+    var currentTab = 'write';
+    var selectedEmotion = null;
+
+    var diaryLoaded = false;
+    var diaryOffset = 0;
+    var diaryHasMore = false;
+
+    var chartLoaded = {};
+    var currentPeriod = 7;
+    var lineChartObj = null;
+    var doughnutChartObj = null;
+
+    var pendingDeleteId = null;
+    var pendingDeleteCard = null;
+
+    // ========================================
+    // 日付表示
+    // ========================================
+    (function() {
+      var now = new Date();
+      var days = ['日', '月', '火', '水', '木', '金', '土'];
+      var y = now.getFullYear();
+      var mo = ('0' + (now.getMonth() + 1)).slice(-2);
+      var d = ('0' + now.getDate()).slice(-2);
+      var day = days[now.getDay()];
+      document.getElementById('headerDate').textContent = y + '年' + mo + '月' + d + '日（' + day + '）';
+    })();
+
+    // ========================================
+    // タブ切替
+    // ========================================
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(function(el) {
+        el.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-item').forEach(function(el) {
+        el.classList.remove('active');
+      });
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('tabBtn-' + tab).classList.add('active');
+      currentTab = tab;
+
+      if (tab === 'diary' && !diaryLoaded) {
+        loadDiary();
+      }
+      if (tab === 'chart' && !chartLoaded[currentPeriod]) {
+        loadChart(currentPeriod);
+      }
+    }
+
+    // ========================================
+    // トースト
+    // ========================================
+    var toastTimer = null;
+    function showToast(message, isError) {
+      var el = document.getElementById('toast');
+      el.textContent = message;
+      el.className = 'toast' + (isError ? ' error' : '');
+      void el.offsetWidth;
+      el.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() { el.classList.remove('show'); }, 3000);
+    }
+
+    function showLoading() {
+      document.getElementById('loading').classList.add('active');
+    }
+
+    function hideLoading() {
+      document.getElementById('loading').classList.remove('active');
+    }
+
+    // ========================================
+    // Tab1: 書く
+    // ========================================
+    function selectEmotion(btn) {
+      document.querySelectorAll('.emotion-pill').forEach(function(p) {
+        p.classList.remove('selected');
+      });
+      btn.classList.add('selected');
+      selectedEmotion = btn.getAttribute('data-emotion');
+    }
+
+    function handleSubmit() {
+      var content = document.getElementById('guchiText').value.trim();
+      if (!selectedEmotion) {
+        showToast('感情タグを選択してください', true);
+        return;
+      }
+      if (!content) {
+        showToast('愚痴を入力してください', true);
+        return;
+      }
+
+      var btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.textContent = '送信中...';
+      document.getElementById('aiResponseCard').classList.remove('show');
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btn.disabled = false;
+          btn.textContent = '確定';
+          if (!res.success) {
+            showToast(res.message, true);
+            return;
+          }
+          document.getElementById('guchiText').value = '';
+          if (res.entry.aiResponse) {
+            document.getElementById('aiResponseText').textContent = res.entry.aiResponse;
+            document.getElementById('aiResponseCard').classList.add('show');
+          } else {
+            showToast('保存しました');
+          }
+          // 直近の同じ感情の記録をトースト通知
+          if (res.recentSame) {
+            var emoji = EMOTION_EMOJI[res.entry.emotionTag] || '';
+            setTimeout(function() {
+              showToast(emoji + ' 前回同じ気持ち: ' + res.recentSame);
+            }, res.entry.aiResponse ? 1500 : 3500);
+          }
+          // 日記・グラフのキャッシュを無効化
+          diaryLoaded = false;
+          diaryOffset = 0;
+          chartLoaded = {};
+        })
+        .withFailureHandler(function(err) {
+          btn.disabled = false;
+          btn.textContent = '確定';
+          var msg = (err && err.message) ? err.message : JSON.stringify(err);
+          showToast('エラー: ' + msg, true);
+        })
+        .saveEntry(selectedEmotion, content);
+    }
+
+    // ========================================
+    // Tab2: 日記
+    // ========================================
+    function loadDiary() {
+      showLoading();
+      google.script.run
+        .withSuccessHandler(function(res) {
+          hideLoading();
+          if (!res.success) { showToast('読み込みに失敗しました', true); return; }
+          diaryLoaded = true;
+          diaryOffset = res.entries.length;
+          diaryHasMore = res.hasMore;
+          renderDiary(res.entries, false);
+        })
+        .withFailureHandler(function(err) {
+          hideLoading();
+          showToast('読み込みに失敗しました', true);
+        })
+        .getEntries(0, 20);
+    }
+
+    function loadMoreEntries() {
+      document.getElementById('loadMoreBtn').disabled = true;
+      google.script.run
+        .withSuccessHandler(function(res) {
+          document.getElementById('loadMoreBtn').disabled = false;
+          if (!res.success) { showToast('読み込みに失敗しました', true); return; }
+          diaryOffset += res.entries.length;
+          diaryHasMore = res.hasMore;
+          renderDiary(res.entries, true);
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById('loadMoreBtn').disabled = false;
+          showToast('読み込みに失敗しました', true);
+        })
+        .getEntries(diaryOffset, 20);
+    }
+
+    function renderDiary(entries, append) {
+      var listEl = document.getElementById('diaryList');
+      if (!append) {
+        listEl.innerHTML = '';
+      }
+
+      if (!append && entries.length === 0) {
+        listEl.innerHTML = '<div class="empty-diary"><div class="empty-diary-icon">💭</div>まだ愚痴がありません<br>気持ちを吐き出してみよう！</div>';
+        document.getElementById('loadMoreBtn').style.display = 'none';
+        return;
+      }
+
+      var lastDate = null;
+      entries.forEach(function(entry) {
+        var dateLabel = formatDateLabel(entry.date);
+        if (dateLabel !== lastDate) {
+          var sep = document.createElement('div');
+          sep.className = 'date-separator';
+          sep.textContent = dateLabel;
+          listEl.appendChild(sep);
+          lastDate = dateLabel;
+        }
+        listEl.appendChild(buildEntryCard(entry));
+      });
+
+      // 展開ボタン表示チェック（追記後も）
+      listEl.querySelectorAll('.entry-content').forEach(function(el) {
+        if (el.scrollHeight > el.clientHeight) {
+          el.nextElementSibling.style.display = 'block';
+        }
+      });
+
+      document.getElementById('loadMoreBtn').style.display = diaryHasMore ? 'block' : 'none';
+    }
+
+    function buildEntryCard(entry) {
+      var card = document.createElement('div');
+      card.className = 'entry-card';
+      card.setAttribute('data-id', entry.id);
+
+      var color = EMOTION_COLORS[entry.emotionTag] || '#999';
+
+      card.innerHTML = '<div class="entry-card-top">'
+        + '<span class="entry-tag-pill" style="background:' + color + '">' + entry.emotionTag + '</span>'
+        + '<div style="display:flex;align-items:center;gap:8px;">'
+        + '<span class="entry-time">' + entry.time + '</span>'
+        + '<button class="entry-delete-btn" onclick="openDeleteModal(\'' + entry.id + '\', this)">🗑️</button>'
+        + '</div>'
+        + '</div>'
+        + '<div class="entry-content">' + escapeHtml(entry.content) + '</div>'
+        + '<span class="entry-expand-btn" onclick="toggleExpand(this)">続きを読む</span>'
+        + (entry.aiResponse
+          ? '<div class="entry-ai"><div class="entry-ai-label">🤖 AIより</div>' + escapeHtml(entry.aiResponse) + '</div>'
+          : '');
+
+      return card;
+    }
+
+    function toggleExpand(btn) {
+      var content = btn.previousElementSibling;
+      content.classList.toggle('expanded');
+      btn.textContent = content.classList.contains('expanded') ? '閉じる' : '続きを読む';
+    }
+
+    function formatDateLabel(dateStr) {
+      if (!dateStr || dateStr.length < 10) return dateStr;
+      var parts = dateStr.split('-');
+      var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      var days = ['日', '月', '火', '水', '木', '金', '土'];
+      return parts[0] + '年' + parseInt(parts[1]) + '月' + parseInt(parts[2]) + '日（' + days[d.getDay()] + '）';
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/\n/g, '<br>');
+    }
+
+    // ========================================
+    // 削除モーダル
+    // ========================================
+    function openDeleteModal(entryId, btn) {
+      pendingDeleteId = entryId;
+      pendingDeleteCard = btn.closest('.entry-card');
+      document.getElementById('deleteModal').classList.add('active');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('active');
+      pendingDeleteId = null;
+      pendingDeleteCard = null;
+    }
+
+    function confirmDelete() {
+      closeDeleteModal();
+      var card = pendingDeleteCard;
+      var entryId = pendingDeleteId;
+      if (!entryId) return;
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (!res.success) { showToast('削除に失敗しました', true); return; }
+          if (card) {
+            card.classList.add('removing');
+            setTimeout(function() {
+              // 日付セパレーターが孤立しないよう確認して削除
+              var prev = card.previousElementSibling;
+              var next = card.nextElementSibling;
+              card.remove();
+              if (prev && prev.classList.contains('date-separator')) {
+                if (!next || next.classList.contains('date-separator') || next.id === 'loadMoreBtn') {
+                  prev.remove();
+                }
+              }
+            }, 300);
+          }
+          chartLoaded = {};
+          showToast('削除しました');
+        })
+        .withFailureHandler(function(err) {
+          showToast('削除に失敗しました', true);
+        })
+        .deleteEntry(entryId);
+    }
+
+    // ========================================
+    // Tab3: グラフ
+    // ========================================
+    function selectPeriod(btn) {
+      document.querySelectorAll('.period-pill').forEach(function(p) { p.classList.remove('selected'); });
+      btn.classList.add('selected');
+      currentPeriod = parseInt(btn.getAttribute('data-days'));
+      if (!chartLoaded[currentPeriod]) {
+        loadChart(currentPeriod);
+      }
+    }
+
+    function loadChart(days) {
+      showLoading();
+      google.script.run
+        .withSuccessHandler(function(res) {
+          hideLoading();
+          if (!res.success) { showToast('グラフの読み込みに失敗しました', true); return; }
+          chartLoaded[days] = true;
+          renderCharts(res);
+        })
+        .withFailureHandler(function(err) {
+          hideLoading();
+          showToast('グラフの読み込みに失敗しました', true);
+        })
+        .getMoodTrend(days);
+    }
+
+    function renderCharts(res) {
+      // サマリー更新
+      var s = res.summary;
+      document.getElementById('summaryTotal').textContent = s.total + '件';
+      document.getElementById('summaryTopEmotion').textContent =
+        s.topEmotion !== '-' ? (EMOTION_EMOJI[s.topEmotion] || '') + ' ' + s.topEmotion : '-';
+      document.getElementById('summaryBusiestDay').textContent = s.busiestDay !== '-' ? formatDateLabel(s.busiestDay) : '-';
+
+      // 折れ線グラフ
+      if (lineChartObj) { lineChartObj.destroy(); lineChartObj = null; }
+      var lineCtx = document.getElementById('lineChart').getContext('2d');
+      var labels = res.data.map(function(d) {
+        var parts = d.date.split('-');
+        return parseInt(parts[1]) + '/' + parseInt(parts[2]);
+      });
+      var scores = res.data.map(function(d) { return d.moodScore; });
+
+      lineChartObj = new Chart(lineCtx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: scores,
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102,126,234,0.1)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: res.data.map(function(d) { return EMOTION_COLORS[d.dominantTag] || '#667eea'; }),
+            pointRadius: 6,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              min: 0.5, max: 5.5,
+              ticks: {
+                stepSize: 1,
+                callback: function(val) {
+                  var labels = { 1: '😡', 2: '😢', 3: '😰', 4: '😤', 5: '😴' };
+                  return labels[val] || '';
+                },
+                font: { size: 11 }
+              }
+            },
+            x: {
+              ticks: { font: { size: 11 }, maxTicksLimit: 10 }
+            }
+          }
+        }
+      });
+
+      // ドーナツグラフ
+      if (doughnutChartObj) { doughnutChartObj.destroy(); doughnutChartObj = null; }
+      var dCtx = document.getElementById('doughnutChart').getContext('2d');
+      var et = s.emotionTotals || {};
+      var dEmotions = EMOTION_LABELS.filter(function(e) { return et[e] > 0; });
+      var dLabels = dEmotions.map(function(e) { return (EMOTION_EMOJI[e] || '') + ' ' + e; });
+      var dData = dEmotions.map(function(e) { return et[e]; });
+      var dColors = dEmotions.map(function(e) { return EMOTION_COLORS[e]; });
+
+      if (dData.length === 0) {
+        dData = [1];
+        dLabels = ['データなし'];
+        dColors = ['#e0e0e0'];
+      }
+
+      doughnutChartObj = new Chart(dCtx, {
+        type: 'doughnut',
+        data: {
+          labels: dLabels,
+          datasets: [{ data: dData, backgroundColor: dColors, borderWidth: 2 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { font: { size: 12 }, boxWidth: 14, padding: 10 }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
