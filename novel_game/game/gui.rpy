@@ -35,9 +35,9 @@ init -2:
     # フォント設定
     # ============================================================
 
-    define gui.text_font = "SourceHanSansLite.ttf"
-    define gui.name_text_font = "SourceHanSansLite.ttf"
-    define gui.interface_text_font = "SourceHanSansLite.ttf"
+    define gui.text_font = "HiraginoMinchoProN.ttc"
+    define gui.name_text_font = "HiraginoMinchoProN.ttc"
+    define gui.interface_text_font = "HiraginoMinchoProN.ttc"
 
     define gui.text_size = 24
     define gui.name_text_size = 28
@@ -108,4 +108,4 @@ init -2:
 
 init -1:
     style default:
-        font "SourceHanSansLite.ttf"
+        font "HiraginoMinchoProN.ttc"

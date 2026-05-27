@@ -5,12 +5,9 @@
 const SPREADSHEET_ID ='1hEkpvDZ7csQSiT-eTXTzzSNFGz7mNGay-RGFYsinEvM';
 const SHEET_ENTRIES = 'Entries';
 const TIMEZONE = 'Asia/Tokyo';
-const GEMINI_API_KEY = 'AIzaSyDgAX3HKVWP3Pwr6FBUR4J7PcV7WMjYZIk';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
-const EMOTION_SCORE = { '怒り': '😡', '悲しみ': '😢', 'ストレス': '😤', '疲れ': '😴', '不安': '😰' };
-const EMOTION_NUM   = { '怒り': 1,    '悲しみ': 2,    '不安': 3,     'ストレス': 4,   '疲れ': 5    };
-const VALID_EMOTIONS = ['怒り', '悲しみ', 'ストレス', '疲れ', '不安'];
-
+const EMOTION_SCORE = { '怒り': '😡', '悲しみ': '😢', '疲れ': '😴', '不安': '😰' };
+const EMOTION_NUM   = { '怒り': 1,    '悲しみ': 2,    '不安': 3,     '疲れ': 4    };
+const VALID_EMOTIONS = ['怒り', '悲しみ', '疲れ', '不安'];
 // ========================================
 // 動作確認用（GASエディタから直接実行）
 // ========================================
@@ -78,54 +75,18 @@ function toDateStr_(cellValue) {
 }
 
 // ========================================
-// Gemini API 呼び出し
-// ========================================
-
-function callGemini_(emotionTag, content) {
-  var prompt = 'あなたは優しくて共感力の高い友人です。\n'
-    + '以下の愚痴を聞いて、短く（2〜3文）、温かく、励ます返事を日本語で書いてください。\n'
-    + '説教や解決策は不要です。ただ寄り添って、気持ちをわかってあげてください。\n\n'
-    + '感情タグ: ' + emotionTag + '\n'
-    + '内容: ' + content + '\n\n'
-    + '返事（2〜3文のみ）:';
-
-  var payload = {
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: {
-      temperature: 0.9,
-      maxOutputTokens: 200,
-      topP: 0.95
-    }
-  };
-
-  var options = {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-
-  try {
-    var url = GEMINI_API_URL + '?key=' + GEMINI_API_KEY;
-    var response = UrlFetchApp.fetch(url, options);
-    var json = JSON.parse(response.getContentText());
-    return json.candidates[0].content.parts[0].text.trim();
-  } catch (e) {
-    return '';
-  }
-}
-
-// ========================================
 // F-001: 愚痴エントリー保存
 // ========================================
 
-function saveEntry(emotionTag, content) {
+function saveEntry(emotionTag, content, intensityLevel) {
   if (!emotionTag || VALID_EMOTIONS.indexOf(emotionTag) === -1) {
     return { success: false, message: '感情タグを選択してください' };
   }
   if (!content || content.trim() === '') {
     return { success: false, message: '愚痴を入力してください' };
   }
+  intensityLevel = parseInt(intensityLevel) || 3;
+  if (intensityLevel < 1 || intensityLevel > 5) intensityLevel = 3;
 
   try {
     var sheet = getSheet_();
@@ -140,16 +101,15 @@ function saveEntry(emotionTag, content) {
     var timeStr = formatTime_(now);
     var moodEmoji = EMOTION_SCORE[emotionTag] || '';
 
-    var aiResponse = callGemini_(emotionTag, content.trim());
-
     sheet.appendRow([
       entryId,
       now,
       dateStr,
       emotionTag,
       content.trim(),
-      aiResponse,
-      moodEmoji
+      '',
+      moodEmoji,
+      intensityLevel
     ]);
     SpreadsheetApp.flush();
 
@@ -181,8 +141,8 @@ function saveEntry(emotionTag, content) {
         time: timeStr,
         emotionTag: emotionTag,
         content: content.trim(),
-        aiResponse: aiResponse,
-        moodEmoji: moodEmoji
+        moodEmoji: moodEmoji,
+        intensityLevel: intensityLevel
       },
       recentSame: recentSame
     };
@@ -207,7 +167,7 @@ function getEntries(offsetRows, limitRows) {
     return { success: true, entries: [], hasMore: false, totalCount: 0 };
   }
 
-  var maxCol = 7;
+  var maxCol = 8;
   var data = sheet.getRange(2, 1, lastRow - 1, maxCol).getValues();
 
   // 日時（列B, index1）で降順ソート
@@ -229,8 +189,8 @@ function getEntries(offsetRows, limitRows) {
       time: formatTime_(ts),
       emotionTag: row[3],
       content: row[4],
-      aiResponse: row[5],
-      moodEmoji: row[6]
+      moodEmoji: row[6],
+      intensityLevel: row[7] || 3
     };
   });
 
@@ -256,7 +216,7 @@ function getMoodTrend(days) {
     return { success: true, data: [], summary: { total: 0, topEmotion: '-', busiestDay: '-' } };
   }
 
-  var maxCol = 7;
+  var maxCol = 8;
   var data = sheet.getRange(2, 1, lastRow - 1, maxCol).getValues();
 
   // 対象期間の開始日を計算
@@ -275,17 +235,28 @@ function getMoodTrend(days) {
   var emotionTotals = {};
   VALID_EMOTIONS.forEach(function(e) { emotionTotals[e] = 0; });
 
+  var dateIntensities = {};
+  var totalIntensitySum = 0;
+  var totalIntensityCount = 0;
+
   filtered.forEach(function(row) {
     var dateStr = toDateStr_(row[2]);
     var emotion = row[3];
+    var intensity = parseInt(row[7]) || 3;
     if (!byDate[dateStr]) {
       byDate[dateStr] = {};
       VALID_EMOTIONS.forEach(function(e) { byDate[dateStr][e] = 0; });
+    }
+    if (!dateIntensities[dateStr]) {
+      dateIntensities[dateStr] = [];
     }
     if (emotion && byDate[dateStr][emotion] !== undefined) {
       byDate[dateStr][emotion]++;
       emotionTotals[emotion]++;
     }
+    dateIntensities[dateStr].push(intensity);
+    totalIntensitySum += intensity;
+    totalIntensityCount++;
   });
 
   // 日付昇順でデータ配列を構築
@@ -295,11 +266,13 @@ function getMoodTrend(days) {
     var dominant = VALID_EMOTIONS.reduce(function(a, b) {
       return counts[a] >= counts[b] ? a : b;
     });
+    var intensities = dateIntensities[dateStr] || [3];
+    var avgIntensity = Math.round(intensities.reduce(function(a, b) { return a + b; }, 0) / intensities.length * 10) / 10;
     return {
       date: dateStr,
       counts: counts,
       dominantTag: dominant,
-      moodScore: EMOTION_NUM[dominant] || 3,
+      moodScore: avgIntensity,
       moodEmoji: EMOTION_SCORE[dominant] || ''
     };
   });
@@ -315,6 +288,8 @@ function getMoodTrend(days) {
     if (count > maxCount) { maxCount = count; busiestDay = d; }
   });
 
+  var avgIntensity = totalIntensityCount > 0 ? Math.round(totalIntensitySum / totalIntensityCount * 10) / 10 : '-';
+
   return {
     success: true,
     data: trendData,
@@ -322,7 +297,8 @@ function getMoodTrend(days) {
       total: filtered.length,
       topEmotion: filtered.length > 0 ? topEmotion : '-',
       busiestDay: busiestDay,
-      emotionTotals: emotionTotals
+      emotionTotals: emotionTotals,
+      avgIntensity: avgIntensity
     }
   };
 }
