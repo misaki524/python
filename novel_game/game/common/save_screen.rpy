@@ -65,51 +65,51 @@ screen save():
     modal True
     zorder 200
 
-    add Solid("#000000cc")
+    add Solid("#000000dd")
 
     frame:
-        xalign 0.5
-        yalign 0.5
-        xsize 700
-        ysize 520
-        xpadding 40
-        ypadding 30
+        xfill True
+        yfill True
+        xpadding 80
+        ypadding 60
         background Frame(Solid("#0a0a0aee"), 5, 5, 5, 5)
 
         vbox:
-            spacing 12
+            spacing 16
+            xalign 0.5
+            yalign 0.5
 
-            text "セーブ" size 30 color "#8b0000" xalign 0.5 bold True
-            text "スロットを選択してください" size 16 color "#666666" xalign 0.5
+            text "セーブ" size 36 color "#8b0000" xalign 0.5 bold True
+            text "スロットを選択してください" size 18 color "#666666" xalign 0.5
 
-            null height 10
+            null height 20
 
             for i in range(1, 6):
                 $ _sv_exists = renpy.can_load(str(i))
                 button:
                     xfill True
-                    ysize 60
+                    ysize 80
                     background (Solid("#1a3a1a") if _sv_exists else Solid("#1a1a1a"))
                     hover_background Solid("#3a1010")
                     action Function(_confirm_overwrite_save, slot=i)
 
                     hbox:
-                        spacing 20
-                        xoffset 20
+                        spacing 30
+                        xoffset 40
                         yalign 0.5
 
-                        text "SLOT [i]" size 22 color "#e0e0e0" min_width 100 yalign 0.5
+                        text "SLOT [i]" size 26 color "#e0e0e0" min_width 120 yalign 0.5
 
                         if _sv_exists:
-                            text _format_save_time(i) size 18 color "#00ff41" yalign 0.5
+                            text _format_save_time(i) size 20 color "#00ff41" yalign 0.5
                         else:
-                            text "— 空きスロット —" size 18 color "#555555" yalign 0.5
+                            text "— 空きスロット —" size 20 color "#555555" yalign 0.5
 
-            null height 10
+            null height 20
 
             textbutton "閉じる":
                 xalign 0.5
-                text_size 22
+                text_size 26
                 text_color "#aaaaaa"
                 text_hover_color "#cc0000"
                 action Return()
@@ -168,51 +168,51 @@ screen load():
     modal True
     zorder 200
 
-    add Solid("#000000cc")
+    add Solid("#000000dd")
 
     frame:
-        xalign 0.5
-        yalign 0.5
-        xsize 700
-        ysize 520
-        xpadding 40
-        ypadding 30
+        xfill True
+        yfill True
+        xpadding 80
+        ypadding 60
         background Frame(Solid("#0a0a0aee"), 5, 5, 5, 5)
 
         vbox:
-            spacing 12
+            spacing 16
+            xalign 0.5
+            yalign 0.5
 
-            text "ロード" size 30 color "#8b0000" xalign 0.5 bold True
+            text "ロード" size 36 color "#8b0000" xalign 0.5 bold True
 
-            null height 10
+            null height 20
 
             for i in range(1, 6):
                 $ _ld_exists = renpy.can_load(str(i))
                 button:
                     xfill True
-                    ysize 60
+                    ysize 80
                     background (Solid("#1a3a1a") if _ld_exists else Solid("#1a1a1a"))
                     hover_background (Solid("#3a1010") if _ld_exists else Solid("#1a1a1a"))
                     action Function(renpy.load, str(i))
                     sensitive _ld_exists
 
                     hbox:
-                        spacing 20
-                        xoffset 20
+                        spacing 30
+                        xoffset 40
                         yalign 0.5
 
-                        text "SLOT [i]" size 22 color ("#e0e0e0" if _ld_exists else "#555555") min_width 100 yalign 0.5
+                        text "SLOT [i]" size 26 color ("#e0e0e0" if _ld_exists else "#555555") min_width 120 yalign 0.5
 
                         if _ld_exists:
-                            text _format_save_time(i) size 18 color "#00ff41" yalign 0.5
+                            text _format_save_time(i) size 20 color "#00ff41" yalign 0.5
                         else:
-                            text "— 空きスロット —" size 18 color "#555555" yalign 0.5
+                            text "— 空きスロット —" size 20 color "#555555" yalign 0.5
 
-            null height 10
+            null height 20
 
             textbutton "閉じる":
                 xalign 0.5
-                text_size 22
+                text_size 26
                 text_color "#aaaaaa"
                 text_hover_color "#cc0000"
                 action Return()
