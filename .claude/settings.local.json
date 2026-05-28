@@ -4,7 +4,9 @@
       "Bash(python3 *)",
       "Bash(pip3 install *)",
       "Bash(brew install *)",
-      "Bash(ffmpeg *)"
+      "Bash(ffmpeg *)",
+      "Bash(git pull *)",
+      "Bash(git push *)"
     ]
   }
 }
