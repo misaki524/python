@@ -8,7 +8,7 @@ label chapter3:
     scene bg_store_inside_dark with dissolve
 
     stop music fadeout 1.0
-    play music "audio/bgm/bgm_horror.ogg" fadein 2.0
+    play music "audio/bgm/fuon.ogg" fadein 2.0
 
     # --- シーン1: 異常の深化 ---
 
@@ -58,7 +58,7 @@ label chapter3:
     nvl clear
     scene bg_store_inside_dark
 
-    play music "audio/bgm/bgm_horror.ogg" fadein 1.0
+    play music "audio/bgm/fuon.ogg" fadein 1.0
     show chara_hood at center with dissolve
 
     "——いた。"
@@ -316,7 +316,7 @@ label chapter3_after:
 
     "『ニ ゲ テ』"
 
-    play music "audio/bgm/bgm_crisis.ogg" fadein 0.5
+    play music "audio/bgm/fuon.ogg" fadein 0.5
     show screen heavy_noise_effect
     pause 0.2
 

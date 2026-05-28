@@ -10,7 +10,7 @@ label ending_dawn:
     hide screen clock_display
 
     stop music fadeout 1.5
-    play music "audio/bgm/bgm_ending_good.ogg" fadein 3.0
+    play music "audio/bgm/fuon.ogg" fadein 3.0
 
     nvl clear
     scene bg_store_front with dissolve
@@ -89,7 +89,7 @@ label ending_survivor:
     hide screen clock_display
 
     stop music fadeout 1.5
-    play music "audio/bgm/bgm_ending_good.ogg" fadein 3.0
+    play music "audio/bgm/fuon.ogg" fadein 3.0
 
     nvl clear
     scene bg_store_inside with dissolve
@@ -142,7 +142,7 @@ label ending_normal:
     hide screen clock_display
 
     stop music fadeout 1.5
-    play music "audio/bgm/bgm_ambient.ogg" fadein 3.0
+    play music "audio/bgm/fuon.ogg" fadein 3.0
 
     nvl clear
     scene bg_store_inside with dissolve
@@ -198,7 +198,7 @@ label ending_fog:
 
     hide screen clock_display
     stop music fadeout 1.0
-    play music "audio/bgm/bgm_ending_bad.ogg" fadein 2.0
+    play music "audio/bgm/fuon.ogg" fadein 2.0
     nvl clear
     scene bg_fog
 
@@ -241,7 +241,7 @@ label ending_swap:
 
     hide screen clock_display
     stop music fadeout 1.0
-    play music "audio/bgm/bgm_ending_bad.ogg" fadein 2.0
+    play music "audio/bgm/fuon.ogg" fadein 2.0
     nvl clear
     scene black with fade
 
@@ -386,7 +386,7 @@ label ending_predecessor:
     hide screen clock_display
 
     stop music fadeout 1.5
-    play music "audio/bgm/bgm_ending_good.ogg" fadein 3.0
+    play music "audio/bgm/fuon.ogg" fadein 3.0
 
     nvl clear
     scene bg_store_inside with dissolve
@@ -462,7 +462,7 @@ label ending_manager:
     hide screen clock_display
 
     stop music fadeout 1.5
-    play music "audio/bgm/bgm_ending_good.ogg" fadein 3.0
+    play music "audio/bgm/fuon.ogg" fadein 3.0
 
     nvl clear
     scene bg_store_inside with dissolve

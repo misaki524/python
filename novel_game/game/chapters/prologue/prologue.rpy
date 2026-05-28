@@ -153,7 +153,7 @@ label prologue_after_memo:
 
     nvl clear
     scene bg_fog with dissolve
-    play music "audio/bgm/bgm_ambient.ogg" fadein 3.0
+    play music "audio/bgm/fuon.ogg" fadein 3.0
 
     p "「……霧？」"
 

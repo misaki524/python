@@ -46,7 +46,7 @@ label chapter2:
 
     nvl clear
     scene bg_store_inside_dark with vpunch
-    play music "audio/bgm/bgm_horror.ogg" fadein 1.5
+    play music "audio/bgm/fuon.ogg" fadein 1.5
 
     "そして、すぐに点灯する。"
 

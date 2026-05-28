@@ -34,7 +34,7 @@ label chapter4:
 
     "蛍光灯が激しく明滅する。"
 
-    play music "audio/bgm/bgm_crisis.ogg" fadein 1.0
+    play music "audio/bgm/fuon.ogg" fadein 1.0
     show screen noise_effect
     pause 0.2
     show screen heavy_noise_effect

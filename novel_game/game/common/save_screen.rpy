@@ -14,22 +14,38 @@ screen save_panel():
     if not main_menu:
         zorder 150
 
-        frame:
+        hbox:
             xalign 1.0
-            yalign 1.0
+            yalign 0.0
             xoffset -15
-            yoffset -15
-            xpadding 24
-            ypadding 14
-            background Frame(Solid("#2a5a99cc"), 8, 8, 8, 8)
+            yoffset 15
+            spacing 8
 
-            textbutton "SAVE":
-                text_size 20
-                text_color "#ffffff"
-                text_hover_color "#cce0ff"
-                text_bold True
-                xalign 0.5
-                action ShowMenu("save")
+            frame:
+                xpadding 24
+                ypadding 14
+                background Frame(Solid("#2a5a99cc"), 8, 8, 8, 8)
+
+                textbutton "SAVE":
+                    text_size 20
+                    text_color "#ffffff"
+                    text_hover_color "#cce0ff"
+                    text_bold True
+                    xalign 0.5
+                    action ShowMenu("save")
+
+            frame:
+                xpadding 24
+                ypadding 14
+                background Frame(Solid("#2a6a2acc"), 8, 8, 8, 8)
+
+                textbutton "LOAD":
+                    text_size 20
+                    text_color "#ffffff"
+                    text_hover_color "#ccffcc"
+                    text_bold True
+                    xalign 0.5
+                    action ShowMenu("load")
 
 init python:
     config.overlay_screens.append("save_panel")
@@ -43,8 +59,9 @@ init python:
         return datetime.datetime.fromtimestamp(mtime).strftime("%Y/%m/%d %H:%M")
 
     def _save_and_return_to_title(slot):
-        """指定スロットにセーブし、メインメニューに戻る"""
         renpy.save(str(slot))
+        renpy.music.stop(channel='music', fadeout=0.3)
+        renpy.sound.stop()
         renpy.full_restart()
 
     def _confirm_overwrite_save(slot):

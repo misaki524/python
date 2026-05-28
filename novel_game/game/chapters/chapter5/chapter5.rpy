@@ -275,7 +275,7 @@ label chapter5_ritual:
     $ current_time = "AM 4:30"
 
     stop music fadeout 1.0
-    play music "audio/bgm/bgm_ending_good.ogg" fadein 2.0
+    play music "audio/bgm/fuon.ogg" fadein 2.0
 
     "全ての手がかりが一つに繋がった。"
 

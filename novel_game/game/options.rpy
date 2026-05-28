@@ -26,9 +26,13 @@ init python:
     config.screen_width = 1280
     config.screen_height = 720
 
-    # エラーログ設定
     config.log_enable = True
     config.developer = True
+
+    def _stop_music_on_quit():
+        renpy.music.stop(fadeout=0.0)
+
+    config.quit_callbacks.append(_stop_music_on_quit)
 
     build.classify("**~", None)
     build.classify("**.bak", None)

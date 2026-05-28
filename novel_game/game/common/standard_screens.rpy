@@ -163,12 +163,12 @@ screen navigation():
         if _in_replay:
             textbutton _("リプレイ終了") action EndReplay(confirm=True)
         elif not main_menu:
-            textbutton _("メインメニュー") action MainMenu()
+            textbutton _("メインメニュー") action [Function(renpy.music.stop, channel='music', fadeout=0.3), Function(renpy.sound.stop), MainMenu()]
 
         textbutton _("バージョン情報") action ShowMenu("about")
 
         if renpy.variant("pc") or (renpy.variant("web") and not renpy.variant("mobile")):
-            textbutton _("終了") action Quit(confirm=not main_menu)
+            textbutton _("終了") action [Function(renpy.music.stop, channel='music', fadeout=0.0), Quit(confirm=not main_menu)]
 
 style navigation_button is gui_button
 style navigation_button_text is gui_button_text
@@ -260,7 +260,7 @@ screen main_menu():
                 text_size 22
                 text_color "#555555"
                 text_hover_color "#cc0000"
-                action Quit(confirm=False)
+                action [Function(renpy.music.stop, channel='music', fadeout=0.0), Quit(confirm=False)]
 
 style main_menu_frame is empty
 style main_menu_vbox is vbox
