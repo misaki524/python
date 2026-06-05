@@ -1,0 +1,17 @@
+# Virtual environments
+.venv/
+venv/
+
+# Ren'Py cache
+novel_game/game/cache/
+
+# Save data
+novel_game/game/saves/
+
+# Logs
+novel_game/log.txt
+novel_game/logs/
+
+# Python
+__pycache__/
+*.pyc
