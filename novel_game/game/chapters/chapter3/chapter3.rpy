@@ -32,7 +32,7 @@ label chapter3:
 
     "と、その時——"
 
-    play sound "audio/sfx/sfx_chime.wav"
+    play sound "audio/bgm/doorchaim.ogg"
 
     "来客チャイムが鳴った。"
 

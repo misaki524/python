@@ -11,23 +11,27 @@
 # ============================================================
 
 screen save_panel():
+    zorder 999
     if not main_menu:
-        zorder 150
+        $ _is_touch = renpy.variant("touch") or renpy.variant("small")
+        $ _btn_size = 26 if _is_touch else 20
+        $ _btn_xpad = 32 if _is_touch else 24
+        $ _btn_ypad = 20 if _is_touch else 14
 
         hbox:
             xalign 1.0
-            yalign 0.0
+            yalign 1.0
             xoffset -15
-            yoffset 15
+            yoffset -15
             spacing 8
 
             frame:
-                xpadding 24
-                ypadding 14
+                xpadding _btn_xpad
+                ypadding _btn_ypad
                 background Frame(Solid("#2a5a99cc"), 8, 8, 8, 8)
 
                 textbutton "SAVE":
-                    text_size 20
+                    text_size _btn_size
                     text_color "#ffffff"
                     text_hover_color "#cce0ff"
                     text_bold True
@@ -35,12 +39,12 @@ screen save_panel():
                     action ShowMenu("save")
 
             frame:
-                xpadding 24
-                ypadding 14
+                xpadding _btn_xpad
+                ypadding _btn_ypad
                 background Frame(Solid("#2a6a2acc"), 8, 8, 8, 8)
 
                 textbutton "LOAD":
-                    text_size 20
+                    text_size _btn_size
                     text_color "#ffffff"
                     text_hover_color "#ccffcc"
                     text_bold True
@@ -64,14 +68,15 @@ init python:
         renpy.sound.stop()
         renpy.full_restart()
 
-    def _confirm_overwrite_save(slot):
-        """既存データがあれば上書き確認、なければ即セーブ"""
+    def _confirm_save(slot):
         if renpy.can_load(str(slot)):
             renpy.invoke_in_new_context(
                 renpy.call_screen, "save_overwrite_confirm", slot=slot
             )
         else:
-            _save_and_return_to_title(slot)
+            renpy.invoke_in_new_context(
+                renpy.call_screen, "save_new_confirm", slot=slot
+            )
 
 # ============================================================
 # セーブ画面（5スロット）
@@ -108,7 +113,7 @@ screen save():
                     ysize 80
                     background (Solid("#1a3a1a") if _sv_exists else Solid("#1a1a1a"))
                     hover_background Solid("#3a1010")
-                    action Function(_confirm_overwrite_save, slot=i)
+                    action Function(_confirm_save, slot=i)
 
                     hbox:
                         spacing 30
@@ -168,6 +173,49 @@ screen save_overwrite_confirm(slot):
                     text_size 24
                     text_color "#cc0000"
                     text_hover_color "#ff0000"
+                    action Function(_save_and_return_to_title, slot=slot)
+
+                textbutton "いいえ":
+                    text_size 24
+                    text_color "#aaaaaa"
+                    text_hover_color "#e0e0e0"
+                    action Return()
+
+# ============================================================
+# 新規セーブ確認ダイアログ
+# ============================================================
+
+screen save_new_confirm(slot):
+    modal True
+    zorder 300
+
+    add Solid("#000000dd")
+
+    frame:
+        xalign 0.5
+        yalign 0.5
+        xsize 500
+        ypadding 30
+        xpadding 40
+        background Frame(Solid("#1a1a1aee"), 5, 5, 5, 5)
+
+        vbox:
+            spacing 20
+            xalign 0.5
+
+            text "セーブしますか？" size 26 color "#e0e0e0" xalign 0.5
+            text "SLOT [slot] にセーブします" size 16 color "#888888" xalign 0.5
+
+            null height 10
+
+            hbox:
+                spacing 60
+                xalign 0.5
+
+                textbutton "はい":
+                    text_size 24
+                    text_color "#00cc41"
+                    text_hover_color "#00ff41"
                     action Function(_save_and_return_to_title, slot=slot)
 
                 textbutton "いいえ":

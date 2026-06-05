@@ -229,6 +229,7 @@ label chapter4_barricade:
         "何も分からないまま、ただ震えている。"
         "冷蔵庫の音が止んだ。蛍光灯も消えた。"
         "完全な暗闇。来客チャイムだけが、繰り返し鳴っている。"
+        play sound "audio/bgm/doorchaim.ogg"
         "ピンポーン。ピンポーン。ピンポーン。"
         "いつまでも。"
         jump ending_eternal

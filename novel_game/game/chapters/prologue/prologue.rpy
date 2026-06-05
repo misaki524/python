@@ -153,7 +153,6 @@ label prologue_after_memo:
 
     nvl clear
     scene bg_fog with dissolve
-    play music "audio/bgm/fuon.ogg" fadein 3.0
 
     p "「……霧？」"
 
@@ -183,7 +182,7 @@ label prologue_after_memo:
 
     "来客チャイムが鳴った。"
 
-    play sound "audio/sfx/sfx_chime.wav"
+    play sound "audio/bgm/doorchaim.ogg"
 
     "ピンポーン"
 

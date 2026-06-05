@@ -348,16 +348,16 @@ label ending_eternal:
 
     "時計だけが、4:59を示し続けている。"
 
-    play sound "audio/sfx/sfx_chime.wav"
+    play sound "audio/bgm/doorchaim.ogg"
 
     "来客チャイムが鳴った。"
     "だが、誰も来ない。"
 
-    play sound "audio/sfx/sfx_chime.wav"
+    play sound "audio/bgm/doorchaim.ogg"
 
     "また鳴った。"
 
-    play sound "audio/sfx/sfx_chime.wav"
+    play sound "audio/bgm/doorchaim.ogg"
 
     "また。"
 

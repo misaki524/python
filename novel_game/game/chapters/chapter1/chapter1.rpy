@@ -2,6 +2,8 @@
 
 label chapter1:
 
+    play music "audio/bgm/fuon.ogg" fadein 2.0
+
     $ current_time = "AM 0:00"
 
     nvl clear
@@ -250,7 +252,7 @@ label chapter1_after_suit:
 
     "また来客チャイムが鳴った。"
 
-    play sound "audio/sfx/sfx_chime.wav"
+    play sound "audio/bgm/doorchaim.ogg"
 
     "ピンポーン"
 
