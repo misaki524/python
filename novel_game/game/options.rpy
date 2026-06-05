@@ -16,7 +16,7 @@ define config.has_sound = True
 define config.has_music = True
 define config.has_voice = False
 
-define config.main_menu_music = None
+define config.main_menu_music = "audio/bgm/fuon.ogg"
 
 define config.save_directory = "ShinyaNoConvini-1"
 
@@ -40,4 +40,5 @@ init python:
     build.classify("**/#**", None)
     build.classify("**/thumbs.db", None)
     build.classify("game/**.rpy", None)
+    build.classify("game/HiraginoMinchoProN.ttc", None)
     build.classify("**", "archive")

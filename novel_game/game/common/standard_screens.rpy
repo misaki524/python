@@ -159,6 +159,7 @@ screen navigation():
 
         textbutton _("ロード") action ShowMenu("load")
         textbutton _("設定") action ShowMenu("preferences")
+        textbutton _("エンディングリスト") action ShowMenu("ending_list")
 
         if _in_replay:
             textbutton _("リプレイ終了") action EndReplay(confirm=True)
@@ -177,79 +178,147 @@ style navigation_button:
     size_group "navigation"
 
 # ============================================================
-# Main Menu（メインメニュー — セーブスロット付き）
+# タイトル画面用 transform
 # ============================================================
+
+transform title_pulse:
+    alpha 0.6
+    block:
+        ease 3.0 alpha 1.0
+        ease 3.0 alpha 0.6
+        repeat
+
+transform title_fade_in:
+    alpha 0.0
+    pause 0.3
+    ease 1.5 alpha 1.0
+
+transform tagline_fade_in:
+    alpha 0.0
+    pause 0.8
+    ease 1.0 alpha 1.0
+
+transform prompt_blink:
+    alpha 0.0
+    pause 2.0
+    block:
+        ease 1.0 alpha 1.0
+        ease 1.0 alpha 0.2
+        repeat
+
+transform fog_drift:
+    xpos 0.0 alpha 0.08
+    block:
+        linear 20.0 xpos -0.1
+        xpos 0.1
+        linear 20.0 xpos 0.0
+        repeat
+
+# ============================================================
+# タイトル画面（起動直後に表示）
+# ============================================================
+
+screen title_screen():
+    add "images/bg/コンビニの店内暗い.jpg" zoom 1.0 yalign 0.5
+    add Solid("#000000CC")
+    add Solid("#0a0008") at fog_drift
+
+    vbox at title_fade_in:
+        xalign 0.5
+        yalign 0.35
+        spacing 0
+
+        text "深夜のコンビニ":
+            size 72
+            color "#8b0000"
+            xalign 0.5
+            bold True
+            outlines [(3, "#200000", 0, 0), (1, "#ff000033", 0, 0)]
+            at title_pulse
+
+    text "午前5時まで、生き延びろ。" at tagline_fade_in:
+        size 22
+        color "#808080"
+        xalign 0.5
+        yalign 0.50
+        italic True
+
+    text "— Click to Start —" at prompt_blink:
+        size 18
+        color "#666666"
+        xalign 0.5
+        yalign 0.85
+
+    text "v[config.version]":
+        size 14
+        color "#333333"
+        xalign 1.0
+        yalign 1.0
+        xoffset -15
+        yoffset -10
+
+    button:
+        xfill True
+        yfill True
+        background None
+        action Return()
+
+    key "K_RETURN" action Return()
+    key "K_SPACE" action Return()
+
+# ============================================================
+# Main Menu（メニュー画面 — タイトル画面の次に表示）
+# ============================================================
+
+transform menu_appear:
+    alpha 0.0
+    ease 0.5 alpha 1.0
 
 screen main_menu():
     tag menu
-    add gui.main_menu_background
 
-    $ _has_saves = any(renpy.can_load(str(_si)) for _si in range(1, 6))
+    add "images/bg/コンビニの店内暗い.jpg" zoom 1.0 yalign 0.5
+    add Solid("#000000BB")
 
-    vbox:
+    text "深夜のコンビニ":
+        size 42
+        color "#8b0000"
         xalign 0.5
-        yalign 0.4
-        spacing 15
+        yalign 0.08
+        bold True
+        outlines [(2, "#200000", 0, 0)]
 
-        text "[config.name!t]":
-            size gui.title_text_size
-            color gui.accent_color
+    vbox at menu_appear:
+        xalign 0.5
+        yalign 0.52
+        spacing 12
+
+        textbutton _("はじめから"):
             xalign 0.5
-            bold True
-
-        text "[config.version]":
-            size gui.notify_text_size
-            color "#555555"
-            xalign 0.5
-
-        null height 30
-
-        # セーブデータがある場合、ロードスロットを表示
-        if _has_saves:
-            frame:
-                xalign 0.5
-                xsize 500
-                ypadding 20
-                xpadding 25
-                background Frame(Solid("#0a0a0acc"), 5, 5, 5, 5)
-
-                vbox:
-                    spacing 8
-
-                    text "— 続きから —" size 20 color "#808080" xalign 0.5
-
-                    null height 5
-
-                    for _si in range(1, 6):
-                        $ _slot_exists = renpy.can_load(str(_si))
-                        if _slot_exists:
-                            button:
-                                xfill True
-                                ysize 45
-                                background Solid("#1a3a1a")
-                                hover_background Solid("#3a1010")
-                                action Function(renpy.load, str(_si))
-
-                                hbox:
-                                    spacing 15
-                                    xalign 0.5
-                                    yalign 0.5
-
-                                    text "SLOT [_si]" size 20 color "#00ff41"
-                                    text _format_save_time(_si) size 16 color "#aaaaaa"
-
-            null height 15
-
-        textbutton _("新規開始"):
-            xalign 0.5
-            text_size 26
-            text_color "#aaaaaa"
+            text_size 28
+            text_color "#e0e0e0"
             text_hover_color "#cc0000"
             action Start()
 
+        textbutton _("続きから"):
+            xalign 0.5
+            text_size 28
+            text_color "#00ff41"
+            text_hover_color "#88ffaa"
+            action ShowMenu("load")
+
+        null height 3
+
+        textbutton _("エンディングリスト"):
+            xalign 0.5
+            text_size 20
+            text_color "#666666"
+            text_hover_color "#cc0000"
+            action ShowMenu("ending_list")
+
         textbutton _("設定"):
             xalign 0.5
-            text_size 22
+            text_size 20
             text_color "#666666"
             text_hover_color "#cc0000"
             action ShowMenu("preferences")
@@ -257,34 +326,24 @@ screen main_menu():
         if renpy.variant("pc") or (renpy.variant("web") and not renpy.variant("mobile")):
             textbutton _("終了"):
                 xalign 0.5
-                text_size 22
-                text_color "#555555"
+                text_size 20
+                text_color "#444444"
                 text_hover_color "#cc0000"
                 action [Function(renpy.music.stop, channel='music', fadeout=0.0), Quit(confirm=False)]
+
+    text "v[config.version]":
+        size 14
+        color "#333333"
+        xalign 1.0
+        yalign 1.0
+        xoffset -15
+        yoffset -10
 
 style main_menu_frame is empty
 style main_menu_vbox is vbox
 style main_menu_text is gui_text
 style main_menu_title is main_menu_text
 style main_menu_version is main_menu_text
-
-style main_menu_frame:
-    xsize 280
-    yfill True
-    background "#0a0a0aCC"
-
-style main_menu_vbox:
-    xalign 1.0
-    xoffset -20
-    xmaximum 800
-    yalign 1.0
-    yoffset -20
-
-style main_menu_title:
-    size gui.title_text_size
-
-style main_menu_version:
-    size gui.notify_text_size
 
 # ============================================================
 # Game Menu（ゲームメニューフレーム）

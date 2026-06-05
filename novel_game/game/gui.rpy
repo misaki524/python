@@ -35,9 +35,9 @@ init -2:
     # フォント設定
     # ============================================================
 
-    define gui.text_font = "HiraginoMinchoProN.ttc"
-    define gui.name_text_font = "HiraginoMinchoProN.ttc"
-    define gui.interface_text_font = "HiraginoMinchoProN.ttc"
+    define gui.text_font = "SourceHanSansLite.ttf"
+    define gui.name_text_font = "SourceHanSansLite.ttf"
+    define gui.interface_text_font = "SourceHanSansLite.ttf"
 
     define gui.text_size = 24
     define gui.name_text_size = 28
@@ -108,4 +108,12 @@ init -2:
 
 init -1:
     style default:
-        font "HiraginoMinchoProN.ttc"
+        font "SourceHanSansLite.ttf"
+
+init python:
+    if renpy.variant("touch") or renpy.variant("small"):
+        gui.text_size = 28
+        gui.name_text_size = 32
+        gui.quick_button_text_size = 24
+        gui.choice_button_text_size = 28
+        gui.choice_button_borders = Borders(50, 20, 50, 20)

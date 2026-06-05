@@ -88,6 +88,29 @@ screen clue_list():
 init python:
     register_screen_toggle("K_TAB", "clue_list", "clue_list_toggle")
 
+# 手がかりリストボタン（タッチ端末向け）
+screen clue_list_button():
+    zorder 998
+    if not main_menu and (renpy.variant("touch") or renpy.variant("small")):
+        frame:
+            xalign 0.0
+            yalign 1.0
+            xoffset 15
+            yoffset -15
+            xpadding 20
+            ypadding 14
+            background Frame(Solid("#3a3a3acc"), 8, 8, 8, 8)
+
+            textbutton "手がかり":
+                text_size 20
+                text_color "#ffa500"
+                text_hover_color "#ffcc00"
+                text_bold True
+                action ToggleScreen("clue_list")
+
+init python:
+    config.overlay_screens.append("clue_list_button")
+
 # ============================================================
 # エンディングリスト画面（common/save_system.rpy の ending_gallery を利用）
 # ============================================================

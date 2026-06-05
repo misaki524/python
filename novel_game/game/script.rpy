@@ -27,7 +27,7 @@ image chara_hood = Solid("#00000000")
 # ============================================================
 
 image ctc_enter:
-    Text(" Enter▼", size=16, color="#666666")
+    Text(" ▼", size=16, color="#666666")
     alpha 0.0
     pause 0.15
     linear 0.35 alpha 1.0
@@ -116,6 +116,16 @@ define CLUE_FLAGS = ["found_diary", "found_camera", "found_girl_clue"]
 
 default persistent.endings_seen = set()
 default persistent.playthrough_count = 0
+
+# ============================================================
+# タイトル画面（メインメニューの前に表示）
+# ============================================================
+
+label splashscreen:
+    scene black
+    play music "audio/bgm/fuon.ogg" fadein 2.0
+    call screen title_screen
+    return
 
 # ============================================================
 # ゲーム開始
