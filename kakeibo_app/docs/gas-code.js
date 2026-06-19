@@ -15,7 +15,7 @@ const SHEET_NAMES = {
 const HEADERS = {
   Expenses: ['expense_id','timestamp','date_str','year_month','category','item_name','amount','payment_method','is_fixed'],
   Income: ['income_id','timestamp','date_str','year_month','source','amount','memo'],
-  Budget: ['year_month','budget_total','budget_food','budget_daily','budget_transport','budget_free','budget_other'],
+  Budget: ['year_month','budget_total','budget_json'],
   WorkLog: ['work_id','date_str','year_month','start_time','end_time','break_minutes','work_hours','hourly_rate','daily_pay','job_name','transport_cost'],
   Debt: ['debt_id','date_str','lender','amount','memo','is_repaid','repaid_date','repaid_amount'],
   Jobs: ['job_id','store_name','hourly_rate','daily_rate','transport_cost','is_active'],
@@ -80,7 +80,7 @@ function handleRequest(e) {
 const HEADERS_JP = {
   Expenses: ['ID','記録日時','日付','年月','カテゴリ','品名・メモ','金額(円)','支払方法','固定費'],
   Income: ['ID','記録日時','日付','年月','収入元','金額(円)','メモ'],
-  Budget: ['年月','月予算合計(円)','食費予算(円)','日用品予算(円)','交通費予算(円)','自由金予算(円)','その他予算(円)'],
+  Budget: ['年月','月予算合計(円)','カテゴリ別予算(JSON)'],
   WorkLog: ['ID','日付','年月','開始時刻','終了時刻','休憩(分)','実働時間(h)','時給(円)','日給(円)','バイト先','交通費(円)'],
   Debt: ['ID','借りた日','貸主・借入先','金額(円)','メモ','返済済み','返済日','返済済み金額(円)'],
   Jobs: ['ID','店名・会社名','時給(円)','日給(円)','交通費/日(円)','有効'],
@@ -105,20 +105,20 @@ function initSheets() {
       sheet = ss.insertSheet(name);
     }
 
-    // 1行目: 英語ヘッダー（プログラム用）
+    // 1行目: 英語ヘッダー（プログラム用）。スキーマ変更時も追従するよう全列を比較
     const existing = sheet.getRange(1, 1, 1, headers.length).getValues()[0];
-    if (existing[0] !== headers[0]) {
+    if (headers.some((h, i) => existing[i] !== h)) {
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     }
 
-    // 2行目: 日本語説明（既に存在しなければ挿入）
+    // 2行目: 日本語説明（無ければ挿入し、常に最新ラベルへ更新）
     const jpHeaders = HEADERS_JP[name];
     if (jpHeaders) {
       const row2 = sheet.getRange(2, 1, 1, jpHeaders.length).getValues()[0];
       if (row2[0] !== jpHeaders[0]) {
         sheet.insertRowBefore(2);
-        sheet.getRange(2, 1, 1, jpHeaders.length).setValues([jpHeaders]);
       }
+      sheet.getRange(2, 1, 1, jpHeaders.length).setValues([jpHeaders]);
 
       // 2行目のスタイル: 背景色グレー、太字、文字色白
       const jpRange = sheet.getRange(2, 1, 1, jpHeaders.length);
@@ -276,14 +276,12 @@ function getBudget(yearMonth) {
 function saveBudget(data) {
   const all = getSheetData_('Budget');
   const existing = all.find(b => b.year_month === data.yearMonth);
+  // カテゴリ別予算は { カテゴリ名: 金額 } を JSON 文字列として保存（項目の増減に追従）
+  const budgets = data.budgets || {};
   const values = [
     data.yearMonth,
     Number(data.total || 0),
-    Number(data.food || 0),
-    Number(data.daily || 0),
-    Number(data.transport || 0),
-    Number(data.free || 0),
-    Number(data.other || 0),
+    JSON.stringify(budgets),
   ];
   if (existing) {
     updateRow_('Budget', existing._row, values);
