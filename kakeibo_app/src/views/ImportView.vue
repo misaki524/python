@@ -97,14 +97,18 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { parseCSV, mapCSVToExpenses } from '../utils/csv-import'
 import { bulkSaveExpenses, isConfigured } from '../services/sheets-api'
+import { useAsync } from '../composables/useAsync'
+import { useToast } from '../composables/useToast'
+
+const { loading: importing, run } = useAsync()
+const toast = useToast()
 
 const csvRows = ref([])
 const csvHeaders = ref([])
 const mapping = ref({ date: '', itemName: '', amount: '', category: '', paymentMethod: '' })
-const importing = ref(false)
 const importResult = ref('')
 
 async function onFileSelect(e) {
@@ -118,7 +122,7 @@ async function onFileSelect(e) {
     autoDetectMapping()
   } catch (err) {
     console.error('CSV parse error:', err)
-    alert('CSVの読み込みに失敗しました')
+    toast.error('CSVの読み込みに失敗しました')
   }
 }
 
@@ -142,19 +146,14 @@ const previewRows = computed(() => mappedRows.value.slice(0, 5))
 
 async function doImport() {
   if (!isConfigured()) {
-    alert('Google Sheets APIの設定が必要です。設定画面からAPI Key等を入力してください。')
+    toast.error('GAS URLが未設定です。設定画面で接続設定を行ってください。')
     return
   }
   if (!mappedRows.value.length) return
-  importing.value = true
-  try {
+  const count = mappedRows.value.length
+  await run(async () => {
     await bulkSaveExpenses(mappedRows.value)
-    importResult.value = `${mappedRows.value.length}件のデータを取り込みました！`
-  } catch (e) {
-    console.error('Import error:', e)
-    alert('取込に失敗しました: ' + e.message)
-  } finally {
-    importing.value = false
-  }
+    importResult.value = `${count}件のデータを取り込みました！`
+  }, { errorMessage: '取込に失敗しました' })
 }
 </script>

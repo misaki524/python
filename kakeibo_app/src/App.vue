@@ -20,11 +20,16 @@
         <span class="tab-label">{{ tab.label }}</span>
       </router-link>
     </nav>
+
+    <ToastHost />
+    <ConfirmDialog />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import ToastHost from './components/ToastHost.vue'
+import ConfirmDialog from './components/ConfirmDialog.vue'
 
 const tabs = [
   { path: '/monthly', icon: '📅', label: '月の支出' },

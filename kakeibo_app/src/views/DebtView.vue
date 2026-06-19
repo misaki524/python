@@ -18,7 +18,9 @@
         <label>メモ</label>
         <input type="text" v-model="form.memo" placeholder="例: ランチ代立替" />
       </div>
-      <button class="btn btn-primary btn-block" @click="submitDebt">登録</button>
+      <button class="btn btn-primary btn-block" @click="submitDebt" :disabled="saving">
+        {{ saving ? '登録中...' : '登録' }}
+      </button>
     </div>
 
     <!-- サマリー -->
@@ -38,7 +40,8 @@
     <!-- 未返済一覧 -->
     <div class="card">
       <h2 class="page-title">未返済一覧</h2>
-      <div v-if="!unpaidDebts.length" class="empty-state">借金はありません</div>
+      <div v-if="loading" class="empty-state">読み込み中...</div>
+      <div v-else-if="!unpaidDebts.length" class="empty-state">借金はありません</div>
       <ul v-else class="expense-list">
         <li v-for="d in unpaidDebts" :key="d.debt_id" class="expense-item" style="flex-wrap: wrap">
           <div class="expense-info" style="min-width: 0">
@@ -77,7 +80,7 @@
           <input type="number" v-model.number="repayAmount" inputmode="numeric" :placeholder="String(remainingAmount(repayTarget))" />
         </div>
         <div style="display: flex; gap: 0.5rem">
-          <button class="btn btn-success" style="flex: 1" @click="doRepay">返済</button>
+          <button class="btn btn-success" style="flex: 1" @click="doRepay" :disabled="saving">返済</button>
           <button class="btn" style="flex: 1; background: var(--border)" @click="repayTarget = null">取消</button>
         </div>
       </div>
@@ -102,6 +105,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { getDebts, saveDebt, repayDebt, deleteDebt, isConfigured } from '../services/sheets-api'
+import { useAsync } from '../composables/useAsync'
+import { useConfirm } from '../composables/useConfirm'
+
+const { loading, run } = useAsync()
+const { loading: saving, run: runSave } = useAsync()
+const { confirm } = useConfirm()
 
 const debts = ref([])
 const form = ref({
@@ -138,48 +147,38 @@ function openRepayDialog(debt) {
 
 async function fetchDebts() {
   if (!isConfigured()) return
-  try {
+  await run(async () => {
     debts.value = await getDebts()
-  } catch (e) {
-    console.error('Failed to fetch debts:', e)
-  }
+  }, { errorMessage: 'データの取得に失敗しました' })
 }
 
 async function submitDebt() {
   if (!form.value.lender || !form.value.amount) return
-  try {
+  await runSave(async () => {
     await saveDebt(form.value)
     form.value.lender = ''
     form.value.amount = ''
     form.value.memo = ''
     await fetchDebts()
-  } catch (e) {
-    console.error('Failed to save debt:', e)
-    alert('登録に失敗しました: ' + e.message)
-  }
+  }, { errorMessage: '登録に失敗しました', successMessage: '登録しました' })
 }
 
 async function doRepay() {
   if (!repayAmount.value || repayAmount.value <= 0) return
-  try {
+  await runSave(async () => {
     await repayDebt(repayTarget.value.debt_id, repayAmount.value)
     repayTarget.value = null
     repayAmount.value = ''
     await fetchDebts()
-  } catch (e) {
-    console.error('Failed to repay:', e)
-    alert('返済記録に失敗しました: ' + e.message)
-  }
+  }, { errorMessage: '返済記録に失敗しました', successMessage: '返済を記録しました' })
 }
 
 async function removeDebt(id) {
-  if (!confirm('削除しますか？')) return
-  try {
+  if (!(await confirm('この借金を削除しますか？', { danger: true, confirmText: '削除' }))) return
+  await run(async () => {
     await deleteDebt(id)
     await fetchDebts()
-  } catch (e) {
-    console.error('Failed to delete debt:', e)
-  }
+  }, { errorMessage: '削除に失敗しました', successMessage: '削除しました' })
 }
 
 onMounted(fetchDebts)

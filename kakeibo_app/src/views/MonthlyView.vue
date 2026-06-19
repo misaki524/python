@@ -103,12 +103,19 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { getCategories, addCategory, PAYMENT_METHODS, getCategoryColor, getCategoryIcon, getPaymentLabel, isCategoryDeleted } from '../utils/categories'
 import { getExpenses, saveExpense, deleteExpense, isConfigured } from '../services/sheets-api'
+import { useMonthNav } from '../composables/useMonthNav'
+import { useAsync } from '../composables/useAsync'
+import { useToast } from '../composables/useToast'
+import { useConfirm } from '../composables/useConfirm'
 
 const today = new Date()
-const currentYM = ref(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`)
+const { currentYM, displayMonth, changeMonth } = useMonthNav()
+const { loading, run } = useAsync()
+const { loading: saving, run: runSave } = useAsync()
+const toast = useToast()
+const { confirm } = useConfirm()
+
 const expenses = ref([])
-const loading = ref(false)
-const saving = ref(false)
 const categories = ref(getCategories())
 const showAddCategory = ref(false)
 const newCategoryName = ref('')
@@ -119,11 +126,6 @@ const form = ref({
   itemName: '',
   amount: '',
   paymentMethod: 'cash',
-})
-
-const displayMonth = computed(() => {
-  const [y, m] = currentYM.value.split('-')
-  return `${y}年${parseInt(m)}月`
 })
 
 const total = computed(() => expenses.value.reduce((s, e) => s + Number(e.amount), 0))
@@ -154,12 +156,6 @@ function badgeClass(pm) {
   return 'cash'
 }
 
-function changeMonth(delta) {
-  const [y, m] = currentYM.value.split('-').map(Number)
-  const d = new Date(y, m - 1 + delta, 1)
-  currentYM.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-}
-
 function doAddCategory() {
   const name = newCategoryName.value.trim()
   if (!name) return
@@ -169,26 +165,20 @@ function doAddCategory() {
     newCategoryName.value = ''
     showAddCategory.value = false
   } else {
-    alert('そのカテゴリは既に存在します')
+    toast.error('そのカテゴリは既に存在します')
   }
 }
 
 async function fetchExpenses() {
   if (!isConfigured()) return
-  loading.value = true
-  try {
+  await run(async () => {
     expenses.value = await getExpenses(currentYM.value)
-  } catch (e) {
-    console.error('Failed to fetch expenses:', e)
-  } finally {
-    loading.value = false
-  }
+  }, { errorMessage: 'データの取得に失敗しました' })
 }
 
 async function submitExpense() {
   if (!form.value.amount || !form.value.category) return
-  saving.value = true
-  try {
+  await runSave(async () => {
     const cat = categories.value.find(c => c.name === form.value.category)
     await saveExpense({
       dateStr: form.value.dateStr,
@@ -201,22 +191,15 @@ async function submitExpense() {
     form.value.itemName = ''
     form.value.amount = ''
     await fetchExpenses()
-  } catch (e) {
-    console.error('Failed to save expense:', e)
-    alert('保存に失敗しました: ' + e.message)
-  } finally {
-    saving.value = false
-  }
+  }, { errorMessage: '保存に失敗しました', successMessage: '保存しました' })
 }
 
 async function removeExpense(id) {
-  if (!confirm('削除しますか？')) return
-  try {
+  if (!(await confirm('この支出を削除しますか？', { danger: true, confirmText: '削除' }))) return
+  await run(async () => {
     await deleteExpense(id)
     await fetchExpenses()
-  } catch (e) {
-    console.error('Failed to delete:', e)
-  }
+  }, { errorMessage: '削除に失敗しました', successMessage: '削除しました' })
 }
 
 watch(currentYM, fetchExpenses)

@@ -84,6 +84,11 @@
 import { ref, onMounted } from 'vue'
 import { initSheets, isConfigured } from '../services/sheets-api'
 import { getCategories, getDeletedCategories, addCategory, removeCategory, editCategory, isDefaultCategory } from '../utils/categories'
+import { useToast } from '../composables/useToast'
+import { useConfirm } from '../composables/useConfirm'
+
+const toast = useToast()
+const { confirm } = useConfirm()
 
 const gasUrl = ref('')
 const sheetUrl = ref('')
@@ -116,7 +121,7 @@ function loadCategories() {
 
 function saveUrl() {
   localStorage.setItem('kakeibo_gas_url', gasUrl.value.trim())
-  alert('URLを保存しました')
+  toast.success('URLを保存しました')
 }
 
 async function testAndInit() {
@@ -141,12 +146,16 @@ function doAddCat() {
     newCatName.value = ''
     loadCategories()
   } else {
-    alert('そのカテゴリは既に存在します')
+    toast.error('そのカテゴリは既に存在します')
   }
 }
 
-function removeCat(name) {
-  if (confirm(`「${name}」を削除しますか？\n過去データはスプレッドシートに残り、「削除された項目です」として表示されます。`)) {
+async function removeCat(name) {
+  const ok = await confirm(
+    `「${name}」を削除しますか？\n過去データはスプレッドシートに残り、「削除された項目です」として表示されます。`,
+    { danger: true, confirmText: '削除' }
+  )
+  if (ok) {
     removeCategory(name)
     loadCategories()
   }
@@ -168,7 +177,7 @@ function saveEditCat(oldName) {
     editingCat.value = ''
     loadCategories()
   } else {
-    alert('その名前は使用できません（既存のカテゴリと重複しています）')
+    toast.error('その名前は使用できません（既存のカテゴリと重複しています）')
   }
 }
 

@@ -48,7 +48,9 @@
         <label>その他</label>
         <input type="number" v-model.number="budgetForm.other" inputmode="numeric" />
       </div>
-      <button class="btn btn-primary btn-block" @click="submitBudget">保存</button>
+      <button class="btn btn-primary btn-block" @click="submitBudget" :disabled="saving">
+        {{ saving ? '保存中...' : '保存' }}
+      </button>
     </div>
 
     <div class="card">
@@ -74,17 +76,15 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { getExpenses, getBudget, saveBudget, isConfigured } from '../services/sheets-api'
+import { useMonthNav } from '../composables/useMonthNav'
+import { useAsync } from '../composables/useAsync'
 
-const today = new Date()
-const currentYM = ref(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`)
+const { currentYM, displayMonth, changeMonth } = useMonthNav()
+const { run } = useAsync()
+const { loading: saving, run: runSave } = useAsync()
+
 const expenses = ref([])
-
 const budgetForm = ref({ total: 0, food: 0, daily: 0, transport: 0, free: 0, other: 0 })
-
-const displayMonth = computed(() => {
-  const [y, m] = currentYM.value.split('-')
-  return `${y}年${parseInt(m)}月`
-})
 
 const totalSpent = computed(() => expenses.value.reduce((s, e) => s + Number(e.amount), 0))
 
@@ -128,15 +128,9 @@ const budgetProgress = computed(() => {
   })
 })
 
-function changeMonth(delta) {
-  const [y, m] = currentYM.value.split('-').map(Number)
-  const d = new Date(y, m - 1 + delta, 1)
-  currentYM.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-}
-
 async function fetchData() {
   if (!isConfigured()) return
-  try {
+  await run(async () => {
     expenses.value = await getExpenses(currentYM.value)
     const b = await getBudget(currentYM.value)
     if (b) {
@@ -149,19 +143,13 @@ async function fetchData() {
         other: Number(b.budget_other) || 0,
       }
     }
-  } catch (e) {
-    console.error('Failed to fetch budget data:', e)
-  }
+  }, { errorMessage: 'データの取得に失敗しました' })
 }
 
 async function submitBudget() {
-  try {
+  await runSave(async () => {
     await saveBudget(currentYM.value, budgetForm.value)
-    alert('予算を保存しました')
-  } catch (e) {
-    console.error('Failed to save budget:', e)
-    alert('保存に失敗しました')
-  }
+  }, { errorMessage: '保存に失敗しました', successMessage: '予算を保存しました' })
 }
 
 watch(currentYM, fetchData)

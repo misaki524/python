@@ -18,7 +18,8 @@
     </div>
 
     <div class="card">
-      <div v-if="!expenses.length" class="empty-state">この週の支出はありません</div>
+      <div v-if="loading" class="empty-state">読み込み中...</div>
+      <div v-else-if="!expenses.length" class="empty-state">この週の支出はありません</div>
       <ul v-else class="expense-list">
         <li v-for="exp in expenses" :key="exp.expense_id" class="expense-item">
           <span class="expense-cat-dot" :style="{ background: getCategoryColor(exp.category) }"></span>
@@ -40,6 +41,9 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { getCategoryColor, getCategoryIcon, isCategoryDeleted } from '../utils/categories'
 import { getExpenses, isConfigured } from '../services/sheets-api'
+import { useAsync } from '../composables/useAsync'
+
+const { loading, run } = useAsync()
 
 function getMonday(d) {
   const date = new Date(d)
@@ -76,7 +80,7 @@ function changeWeek(delta) {
 
 async function fetchWeekly() {
   if (!isConfigured()) return
-  try {
+  await run(async () => {
     const start = formatDate(weekStart.value)
     const end = formatDate(weekEnd.value)
     const ym = start.slice(0, 7)
@@ -84,9 +88,7 @@ async function fetchWeekly() {
     expenses.value = all
       .filter(e => e.date_str >= start && e.date_str <= end)
       .sort((a, b) => b.date_str.localeCompare(a.date_str))
-  } catch (e) {
-    console.error('Failed to fetch weekly expenses:', e)
-  }
+  }, { errorMessage: 'データの取得に失敗しました' })
 }
 
 watch(weekStart, fetchWeekly)

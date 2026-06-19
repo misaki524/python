@@ -33,7 +33,8 @@
     <!-- 収入一覧 -->
     <div class="card">
       <h2 class="page-title">収入一覧</h2>
-      <div v-if="!incomes.length" class="empty-state">収入データがありません</div>
+      <div v-if="loading" class="empty-state">読み込み中...</div>
+      <div v-else-if="!incomes.length" class="empty-state">収入データがありません</div>
       <ul v-else class="expense-list">
         <li v-for="inc in incomes" :key="inc.income_id" class="expense-item">
           <div class="expense-info">
@@ -92,23 +93,24 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { getExpenses, getIncome, saveIncome, deleteIncome, isConfigured } from '../services/sheets-api'
+import { useMonthNav } from '../composables/useMonthNav'
+import { useAsync } from '../composables/useAsync'
+import { useConfirm } from '../composables/useConfirm'
 
 const today = new Date()
-const currentYM = ref(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`)
+const { currentYM, displayMonth, changeMonth } = useMonthNav()
+const { loading, run } = useAsync()
+const { loading: saving, run: runSave } = useAsync()
+const { confirm } = useConfirm()
+
 const expenses = ref([])
 const incomes = ref([])
-const saving = ref(false)
 
 const form = ref({
   dateStr: today.toISOString().slice(0, 10),
   source: '',
   amount: '',
   memo: '',
-})
-
-const displayMonth = computed(() => {
-  const [y, m] = currentYM.value.split('-')
-  return `${y}年${parseInt(m)}月`
 })
 
 const totalIncome = computed(() => incomes.value.reduce((s, e) => s + Number(e.amount), 0))
@@ -162,47 +164,31 @@ function sumByCategoryNonCard(category) {
     .reduce((s, e) => s + Number(e.amount), 0)
 }
 
-function changeMonth(delta) {
-  const [y, m] = currentYM.value.split('-').map(Number)
-  const d = new Date(y, m - 1 + delta, 1)
-  currentYM.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-}
-
 async function fetchData() {
   if (!isConfigured()) return
-  try {
+  await run(async () => {
     expenses.value = await getExpenses(currentYM.value)
     incomes.value = await getIncome(currentYM.value)
-  } catch (e) {
-    console.error('Failed to fetch data:', e)
-  }
+  }, { errorMessage: 'データの取得に失敗しました' })
 }
 
 async function submitIncome() {
   if (!form.value.source || !form.value.amount) return
-  saving.value = true
-  try {
+  await runSave(async () => {
     await saveIncome(form.value)
     form.value.source = ''
     form.value.amount = ''
     form.value.memo = ''
     await fetchData()
-  } catch (e) {
-    console.error('Failed to save income:', e)
-    alert('保存に失敗しました: ' + e.message)
-  } finally {
-    saving.value = false
-  }
+  }, { errorMessage: '保存に失敗しました', successMessage: '保存しました' })
 }
 
 async function removeIncome(id) {
-  if (!confirm('削除しますか？')) return
-  try {
+  if (!(await confirm('この収入を削除しますか？', { danger: true, confirmText: '削除' }))) return
+  await run(async () => {
     await deleteIncome(id)
     await fetchData()
-  } catch (e) {
-    console.error('Failed to delete income:', e)
-  }
+  }, { errorMessage: '削除に失敗しました', successMessage: '削除しました' })
 }
 
 watch(currentYM, fetchData)

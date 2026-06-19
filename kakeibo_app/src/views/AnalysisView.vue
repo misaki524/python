@@ -49,22 +49,20 @@ import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { Chart, registerables } from 'chart.js'
 import { getExpenses, getIncome, isConfigured } from '../services/sheets-api'
 import { getCategoryColor, PAYMENT_METHODS, getPaymentLabel } from '../utils/categories'
+import { useMonthNav } from '../composables/useMonthNav'
+import { useAsync } from '../composables/useAsync'
 
 Chart.register(...registerables)
 
-const today = new Date()
-const currentYM = ref(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`)
+const { currentYM, displayMonth, changeMonth } = useMonthNav()
+const { run } = useAsync()
+
 const expenses = ref([])
 const incomes = ref([])
 const categoryChart = ref(null)
 const paymentChart = ref(null)
 let catChartInstance = null
 let payChartInstance = null
-
-const displayMonth = computed(() => {
-  const [y, m] = currentYM.value.split('-')
-  return `${y}年${parseInt(m)}月`
-})
 
 const totalExpense = computed(() => expenses.value.reduce((s, e) => s + Number(e.amount), 0))
 const totalIncome = computed(() => incomes.value.reduce((s, e) => s + Number(e.amount), 0))
@@ -83,12 +81,6 @@ const noSpendDays = computed(() => {
   }
   return count
 })
-
-function changeMonth(delta) {
-  const [y, m] = currentYM.value.split('-').map(Number)
-  const d = new Date(y, m - 1 + delta, 1)
-  currentYM.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-}
 
 function renderCharts() {
   if (!categoryChart.value || !paymentChart.value) return
@@ -133,14 +125,12 @@ function renderCharts() {
 
 async function fetchData() {
   if (!isConfigured()) return
-  try {
+  await run(async () => {
     expenses.value = await getExpenses(currentYM.value)
     incomes.value = await getIncome(currentYM.value)
     await nextTick()
     renderCharts()
-  } catch (e) {
-    console.error('Failed to fetch analysis data:', e)
-  }
+  }, { errorMessage: 'データの取得に失敗しました' })
 }
 
 watch(currentYM, fetchData)

@@ -83,8 +83,8 @@
         実働 {{ calcHours.toFixed(1) }}h → {{ calcPay.toLocaleString() }}円
         <span v-if="calcTransport > 0">＋ 交通費{{ calcTransport.toLocaleString() }}円</span>
       </div>
-      <button class="btn btn-primary btn-block" @click="submitWork" :disabled="!selectedJob">
-        {{ selectedJob ? '保存' : 'バイト先を選択してください' }}
+      <button class="btn btn-primary btn-block" @click="submitWork" :disabled="!selectedJob || saving">
+        {{ selectedJob ? (saving ? '保存中...' : '保存') : 'バイト先を選択してください' }}
       </button>
     </div>
 
@@ -113,7 +113,8 @@
     <!-- 勤務一覧 -->
     <div class="card">
       <h2 class="page-title">勤務一覧</h2>
-      <div v-if="!workLogs.length" class="empty-state">勤務データがありません</div>
+      <div v-if="loading" class="empty-state">読み込み中...</div>
+      <div v-else-if="!workLogs.length" class="empty-state">勤務データがありません</div>
       <ul v-else class="expense-list">
         <li v-for="w in workLogs" :key="w.work_id" class="expense-item">
           <div class="expense-info">
@@ -137,9 +138,16 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { getWorkLog, saveWorkLog, deleteWorkLog, getJobs, saveJob, deleteJob, isConfigured } from '../services/sheets-api'
+import { useMonthNav } from '../composables/useMonthNav'
+import { useAsync } from '../composables/useAsync'
+import { useConfirm } from '../composables/useConfirm'
 
 const today = new Date()
-const currentYM = ref(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`)
+const { currentYM, displayMonth, changeMonth } = useMonthNav()
+const { loading, run } = useAsync()
+const { loading: saving, run: runAction } = useAsync()
+const { confirm } = useConfirm()
+
 const workLogs = ref([])
 const jobs = ref([])
 const selectedJob = ref(null)
@@ -152,11 +160,6 @@ const form = ref({
   startTime: '09:00',
   endTime: '17:00',
   breakMinutes: 60,
-})
-
-const displayMonth = computed(() => {
-  const [y, m] = currentYM.value.split('-')
-  return `${y}年${parseInt(m)}月`
 })
 
 const calcHours = computed(() => {
@@ -192,23 +195,15 @@ function selectJob(job) {
   selectedJob.value = job
 }
 
-function changeMonth(delta) {
-  const [y, m] = currentYM.value.split('-').map(Number)
-  const d = new Date(y, m - 1 + delta, 1)
-  currentYM.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-}
-
 async function fetchData() {
   if (!isConfigured()) return
-  try {
+  await run(async () => {
     workLogs.value = await getWorkLog(currentYM.value)
     jobs.value = await getJobs()
     if (jobs.value.length && !selectedJob.value) {
       selectedJob.value = jobs.value[0]
     }
-  } catch (e) {
-    console.error('Failed to fetch work data:', e)
-  }
+  }, { errorMessage: 'データの取得に失敗しました' })
 }
 
 function openAddJob() {
@@ -235,34 +230,33 @@ function closeJobForm() {
 
 async function submitJob() {
   if (!jobForm.value.storeName || !jobForm.value.hourlyRate) return
-  try {
+  const isEdit = !!editingJobId.value
+  await runAction(async () => {
     const payload = { ...jobForm.value }
     if (editingJobId.value) payload.id = editingJobId.value
     await saveJob(payload)
     closeJobForm()
     jobForm.value = { storeName: '', hourlyRate: '', dailyRate: '', transportCost: 0 }
     await fetchData()
-  } catch (e) {
-    console.error('Failed to save job:', e)
-    alert((editingJobId.value ? '更新' : '登録') + 'に失敗しました: ' + e.message)
-  }
+  }, { errorMessage: (isEdit ? '更新' : '登録') + 'に失敗しました', successMessage: (isEdit ? '更新' : '登録') + 'しました' })
 }
 
 async function removeJob(job) {
-  if (!confirm(`バイト先「${job.store_name}」を削除しますか？\n過去の勤怠データがある場合はスプレッドシートに残り、「削除された項目です」として記載されます。`)) return
-  try {
+  const ok = await confirm(
+    `バイト先「${job.store_name}」を削除しますか？\n過去の勤怠データがある場合はスプレッドシートに残り、「削除された項目です」として記載されます。`,
+    { danger: true, confirmText: '削除' }
+  )
+  if (!ok) return
+  await runAction(async () => {
     await deleteJob(job.job_id)
     if (selectedJob.value?.job_id === job.job_id) selectedJob.value = null
     await fetchData()
-  } catch (e) {
-    console.error('Failed to delete job:', e)
-    alert('削除に失敗しました: ' + e.message)
-  }
+  }, { errorMessage: '削除に失敗しました', successMessage: '削除しました' })
 }
 
 async function submitWork() {
   if (!selectedJob.value) return
-  try {
+  await runAction(async () => {
     await saveWorkLog({
       dateStr: form.value.dateStr,
       startTime: form.value.startTime,
@@ -273,20 +267,15 @@ async function submitWork() {
       transportCost: Number(selectedJob.value.transport_cost || 0),
     })
     await fetchData()
-  } catch (e) {
-    console.error('Failed to save work log:', e)
-    alert('保存に失敗しました: ' + e.message)
-  }
+  }, { errorMessage: '保存に失敗しました', successMessage: '保存しました' })
 }
 
 async function removeWork(id) {
-  if (!confirm('削除しますか？')) return
-  try {
+  if (!(await confirm('この勤務記録を削除しますか？', { danger: true, confirmText: '削除' }))) return
+  await runAction(async () => {
     await deleteWorkLog(id)
     await fetchData()
-  } catch (e) {
-    console.error('Failed to delete:', e)
-  }
+  }, { errorMessage: '削除に失敗しました', successMessage: '削除しました' })
 }
 
 watch(currentYM, fetchData)
