@@ -34,6 +34,7 @@ import ConfirmDialog from './components/ConfirmDialog.vue'
 const tabs = [
   { path: '/monthly', icon: '📅', label: '月の支出' },
   { path: '/weekly', icon: '📆', label: '週の支出' },
+  { path: '/annual', icon: '🗓️', label: '年間' },
   { path: '/income', icon: '💵', label: '収入・収支' },
   { path: '/budget', icon: '💰', label: '予算' },
   { path: '/work', icon: '⏰', label: 'バイト' },
@@ -43,7 +44,7 @@ const tabs = [
   { path: '/settings', icon: '⚙️', label: '設定' },
 ]
 
-const mobileTabs = computed(() => tabs.slice(0, 7))
+const mobileTabs = computed(() => tabs.slice(0, 8))
 
 const isMobile = ref(window.innerWidth <= 768)
 

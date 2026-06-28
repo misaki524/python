@@ -298,21 +298,29 @@ function breakEnd() {
 
 // ========================================
 // F-005: 日報保存
+// 列構成: A:日付 / B:タスク内容 / C:反省など / D:コメント
+// コメント(D列)は別の人が記入するためアプリからは書き換えない。
 // ========================================
 
-function saveReport(reportText) {
+function saveReport(task, reflection) {
   var sheet = getSheet_(SHEET_DAILY_REPORT);
   var rows = findTodayRows_(SHEET_DAILY_REPORT);
+  var taskVal = task || '';
+  var reflectionVal = reflection || '';
 
   if (rows.length > 0) {
-    // 更新
-    sheet.getRange(rows[0].row, 2).setValue(reportText);
+    // 更新（タスク内容・反省などのみ。コメント列は触らない）
+    var rowNum = rows[0].row;
+    sheet.getRange(rowNum, 2).setValue(taskVal);        // B: タスク内容
+    sheet.getRange(rowNum, 3).setValue(reflectionVal);  // C: 反省など
     return { success: true, message: '日報を更新しました' };
   } else {
-    // 新規作成
+    // 新規作成（コメント列は空欄でスタート）
     sheet.appendRow([
       new Date(getTodayStr_() + 'T00:00:00'),
-      reportText
+      taskVal,
+      reflectionVal,
+      ''
     ]);
     return { success: true, message: '日報を保存しました' };
   }
@@ -331,7 +339,9 @@ function getTodayStatus() {
     totalWorkHours: '',
     currentStatus: '',
     breaks: [],
-    report: ''
+    task: '',
+    reflection: '',
+    comment: ''
   };
 
   // 勤怠情報（複数セッション対応）
@@ -384,10 +394,13 @@ function getTodayStatus() {
     result.currentStatus = '退勤済';
   }
 
-  // 日報情報
+  // 日報情報（B:タスク内容 / C:反省など / D:コメント）
   var reportRows = findTodayRows_(SHEET_DAILY_REPORT);
   if (reportRows.length > 0) {
-    result.report = reportRows[0].data[1] || '';
+    var rep = reportRows[0].data;
+    result.task = rep[1] || '';
+    result.reflection = rep[2] || '';
+    result.comment = rep[3] || '';
   }
 
   return result;

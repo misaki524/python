@@ -10,11 +10,14 @@ async function callGAS(action, data = {}) {
   const baseUrl = getGasUrl()
   if (!baseUrl) throw new Error('GAS URLが設定されていません。設定画面からURLを入力してください。')
 
-  const url = new URL(baseUrl)
-  url.searchParams.set('action', action)
-  url.searchParams.set('data', JSON.stringify(data))
-
-  const response = await fetch(url.toString())
+  // データはURL(GET)ではなくPOSTのボディで送る。
+  // GETだと一括取込時にURLが長くなりすぎて上限を超え失敗するため。
+  // Content-Type は text/plain にして CORS のプリフライト(GAS非対応)を回避する。
+  const response = await fetch(baseUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action, ...data }),
+  })
   const text = await response.text()
 
   if (text.startsWith('<!')) {
@@ -45,10 +48,13 @@ export async function bulkSaveExpenses(expenses) {
   if (!baseUrl) throw new Error('GAS URLが未設定')
 
   const batchSize = 20
+  let totalSaved = 0
   for (let i = 0; i < expenses.length; i += batchSize) {
     const batch = expenses.slice(i, i + batchSize)
-    await callGAS('bulkSaveExpenses', { expenses: batch })
+    const result = await callGAS('bulkSaveExpenses', { expenses: batch })
+    totalSaved += Number(result?.saved || 0)
   }
+  return { saved: totalSaved }
 }
 
 // --- Income ---

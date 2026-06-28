@@ -64,7 +64,7 @@ function handleRequest(e) {
       case 'saveDebt': result = saveDebt(body); break;
       case 'repayDebt': result = repayDebt(body); break;
       case 'deleteDebt': result = deleteRow_('Debt', 'debt_id', body.id); break;
-      default: result = { error: 'Unknown action: ' + action };
+      default: throw new Error('Unknown action: ' + action);
     }
 
     return ContentService.createTextOutput(JSON.stringify({ ok: true, data: result }))
@@ -99,10 +99,18 @@ const SHEET_COLORS = {
 
 function initSheets() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss) {
+    throw new Error('スプレッドシートに紐づいていません。対象スプレッドシートを開き「拡張機能 → Apps Script」から作ったプロジェクトにコードを貼り直してください。');
+  }
+  const created = [];
+  const existing = [];
   for (const [name, headers] of Object.entries(HEADERS)) {
     let sheet = ss.getSheetByName(name);
     if (!sheet) {
       sheet = ss.insertSheet(name);
+      created.push(name);
+    } else {
+      existing.push(name);
     }
 
     // 1行目: 英語ヘッダー（プログラム用）。スキーマ変更時も追従するよう全列を比較
@@ -148,7 +156,13 @@ function initSheets() {
       sheet.autoResizeColumn(c);
     }
   }
-  return { message: 'シート初期化完了（日本語ヘッダー・色分け適用済み）' };
+  return {
+    message: 'シート初期化完了（日本語ヘッダー・色分け適用済み）',
+    spreadsheetName: ss.getName(),
+    spreadsheetUrl: ss.getUrl(),
+    created: created,
+    existing: existing,
+  };
 }
 
 // --- ヘルパー ---

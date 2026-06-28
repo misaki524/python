@@ -22,6 +22,14 @@
       <div v-if="testResult" style="margin-top: 0.5rem; font-size: 0.9rem" :class="testOk ? 'amount-positive' : 'amount-negative'">
         {{ testResult }}
       </div>
+      <div v-if="testOk && testDetail.spreadsheetName" style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted); line-height: 1.6">
+        <div>紐づきシート: <strong>{{ testDetail.spreadsheetName }}</strong></div>
+        <div v-if="testDetail.spreadsheetUrl">
+          <a :href="testDetail.spreadsheetUrl" target="_blank" rel="noopener" style="color: var(--primary)">スプレッドシートを開く</a>
+        </div>
+        <div>今回作成: {{ testDetail.created.length ? testDetail.created.join(', ') : 'なし（全シート既に存在）' }}</div>
+        <div v-if="testDetail.existing.length">既存: {{ testDetail.existing.join(', ') }}</div>
+      </div>
     </div>
 
     <div class="card">
@@ -95,6 +103,7 @@ const sheetUrl = ref('')
 const testing = ref(false)
 const testResult = ref('')
 const testOk = ref(false)
+const testDetail = ref({ spreadsheetName: '', spreadsheetUrl: '', created: [], existing: [] })
 const categories = ref([])
 const deletedCategories = ref([])
 const newCatName = ref('')
@@ -127,10 +136,20 @@ function saveUrl() {
 async function testAndInit() {
   testing.value = true
   testResult.value = ''
+  testDetail.value = { spreadsheetName: '', spreadsheetUrl: '', created: [], existing: [] }
   try {
     const result = await initSheets()
     testOk.value = true
-    testResult.value = '接続成功！シートが初期化されました: ' + (result.message || 'OK')
+    const createdCount = (result.created || []).length
+    testResult.value = createdCount
+      ? `接続成功！${createdCount}個のシートを新規作成しました`
+      : '接続成功（シートは既に全て存在しています）'
+    testDetail.value = {
+      spreadsheetName: result.spreadsheetName || '',
+      spreadsheetUrl: result.spreadsheetUrl || '',
+      created: result.created || [],
+      existing: result.existing || [],
+    }
   } catch (e) {
     testOk.value = false
     testResult.value = '接続失敗: ' + (e.message || e)

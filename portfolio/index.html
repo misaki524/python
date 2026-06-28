@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>開発ポートフォリオ</title>
+<meta name="description" content="個人開発・趣味開発で制作したWebアプリ／ゲームのポートフォリオです。" />
+<style>
+  :root {
+    --bg: #1d1410;
+    --bg-soft: #271a13;
+    --surface: #ffffff;
+    --surface-soft: #fdf7f1;
+    --ink: #2a211c;
+    --ink-soft: #6b5d54;
+    --muted: #a89a8e;
+    --line: #f0e4d8;
+    --accent: #f97316;
+    --accent-2: #f43f5e;
+    --accent-soft: #fff1e6;
+    --accent-line: #ffd9bf;
+    --radius: 16px;
+    --shadow: 0 10px 40px -12px rgba(120, 60, 20, 0.22);
+    --shadow-sm: 0 4px 18px -8px rgba(120, 60, 20, 0.26);
+    --max: 1080px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans",
+      "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    color: var(--ink);
+    background: var(--surface-soft);
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Scroll progress ---------- */
+  .progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    z-index: 200; transition: width 0.1s linear;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 251, 247, 0.82);
+    backdrop-filter: saturate(160%) blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+  .brand {
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .brand .dot {
+    width: 11px; height: 11px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    animation: pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.55); }
+    50% { box-shadow: 0 0 0 7px rgba(249, 115, 22, 0); }
+  }
+  .nav-links { display: flex; gap: 6px; }
+  .nav-links a {
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    font-weight: 600;
+    transition: background 0.18s, color 0.18s;
+  }
+  .nav-links a:hover { background: var(--accent-soft); color: var(--accent); }
+  .nav-toggle { display: none; background: none; border: 0; cursor: pointer; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    background:
+      radial-gradient(1200px 500px at 75% -10%, rgba(244, 63, 94, 0.30), transparent 60%),
+      radial-gradient(900px 500px at 10% 10%, rgba(249, 115, 22, 0.34), transparent 55%),
+      var(--bg);
+    color: #fff;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(700px 360px at 50% 0%, #000 30%, transparent 75%);
+  }
+  /* floating warm orbs */
+  .blob {
+    position: absolute; border-radius: 50%;
+    filter: blur(72px); opacity: 0.5; z-index: 0; pointer-events: none;
+  }
+  .blob.b1 {
+    width: 360px; height: 360px; top: -90px; right: 6%;
+    background: radial-gradient(circle, #fb923c, transparent 70%);
+    animation: float1 17s ease-in-out infinite;
+  }
+  .blob.b2 {
+    width: 300px; height: 300px; bottom: -70px; left: 2%;
+    background: radial-gradient(circle, #f43f5e, transparent 70%);
+    animation: float2 21s ease-in-out infinite;
+  }
+  .blob.b3 {
+    width: 240px; height: 240px; top: 28%; left: 42%;
+    background: radial-gradient(circle, #fbbf24, transparent 70%);
+    animation: float3 24s ease-in-out infinite;
+  }
+  @keyframes float1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-34px, 42px) scale(1.08); } }
+  @keyframes float2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(42px, -30px) scale(1.1); } }
+  @keyframes float3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-26px, -38px) scale(1.06); } }
+
+  .hero-inner { position: relative; z-index: 2; padding: 96px 0 104px; }
+  .hero-inner > * { animation: heroIn 0.85s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .hero-inner .eyebrow { animation-delay: 0.05s; }
+  .hero-inner h1 { animation-delay: 0.15s; }
+  .hero-inner p { animation-delay: 0.28s; }
+  .hero-inner .hero-cta { animation-delay: 0.4s; }
+  .hero-inner .hero-stats { animation-delay: 0.52s; }
+  @keyframes heroIn { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em;
+    color: #ffd9b8;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.16);
+    padding: 7px 14px; border-radius: 999px;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(2.1rem, 5.4vw, 3.4rem);
+    line-height: 1.2;
+    margin: 22px 0 18px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(100deg, #fbbf24, #fb7185, #fb923c, #fbbf24);
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shimmer 6s linear infinite;
+  }
+  @keyframes shimmer { to { background-position: 200% center; } }
+  .hero p {
+    font-size: 1.08rem;
+    color: #ecdccb;
+    max-width: 620px;
+    margin: 0 0 32px;
+  }
+  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    position: relative; overflow: hidden;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 24px; border-radius: 12px;
+    font-weight: 700; font-size: 0.95rem;
+    transition: transform 0.16s, box-shadow 0.16s, background 0.16s;
+  }
+  .btn::after {
+    content: ""; position: absolute; top: 0; left: -130%;
+    width: 55%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transform: skewX(-20deg); transition: left 0.6s ease;
+  }
+  .btn:hover::after { left: 150%; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    box-shadow: 0 12px 30px -10px rgba(249, 115, 22, 0.6);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 38px -12px rgba(249, 115, 22, 0.7); }
+  .btn-ghost {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
+
+  .hero-stats {
+    display: flex; gap: 40px; margin-top: 56px; flex-wrap: wrap;
+  }
+  .hero-stats .stat strong {
+    display: block; font-size: 1.9rem; font-weight: 800; color: #fff;
+  }
+  .hero-stats .stat span { color: #c7b6a4; font-size: 0.85rem; }
+
+  /* ---------- Sections ---------- */
+  section { padding: 84px 0; }
+  .section-head { margin-bottom: 44px; }
+  .section-head .kicker {
+    color: var(--accent); font-weight: 800; font-size: 0.82rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .section-head h2 {
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+    margin: 8px 0 0; font-weight: 800; letter-spacing: -0.01em;
+  }
+  .section-head p { color: var(--ink-soft); margin: 12px 0 0; max-width: 640px; }
+
+  /* ---------- About / skills ---------- */
+  #about { background: var(--surface); }
+  .about-grid {
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: start;
+  }
+  .about-grid p { color: var(--ink-soft); margin: 0 0 16px; }
+  .skill-group { margin-bottom: 22px; }
+  .skill-group h4 {
+    margin: 0 0 12px; font-size: 0.82rem; letter-spacing: 0.06em;
+    color: var(--muted); text-transform: uppercase; font-weight: 800;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+  .chip {
+    background: var(--surface-soft);
+    border: 1px solid var(--line);
+    padding: 7px 14px; border-radius: 999px;
+    font-size: 0.86rem; font-weight: 600; color: var(--ink-soft);
+    transition: transform 0.16s, border-color 0.16s, color 0.16s;
+  }
+  .chip:hover { transform: translateY(-2px); border-color: var(--accent-line); color: var(--accent); }
+  .chip.accent { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+
+  /* ---------- Works overview (一目で把握) ---------- */
+  .work-overview {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    margin-bottom: 52px;
+  }
+  .ov-card {
+    position: relative;
+    display: flex; flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+    opacity: 0;
+  }
+  .ov-card::before {
+    content: ""; position: absolute; left: 0; top: 0; height: 3px; width: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease;
+  }
+  .ov-card:hover::before { transform: scaleX(1); }
+  .ov-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+    border-color: var(--accent-line);
+  }
+  .work-overview.in .ov-card { animation: cardUp 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; opacity: 1; }
+  .work-overview.in .ov-card:nth-child(2) { animation-delay: 0.12s; }
+  .work-overview.in .ov-card:nth-child(3) { animation-delay: 0.24s; }
+  @keyframes cardUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+  .ov-top { display: flex; align-items: center; justify-content: space-between; }
+  .ov-num { font-size: 0.78rem; font-weight: 800; color: var(--accent); letter-spacing: 0.1em; }
+  .ov-badge {
+    font-size: 0.7rem; font-weight: 800; letter-spacing: 0.04em;
+    color: var(--accent); background: var(--accent-soft);
+    border: 1px solid var(--accent-line); padding: 4px 10px; border-radius: 999px;
+  }
+  .ov-card h4 { margin: 12px 0 6px; font-size: 1.12rem; font-weight: 800; }
+  .ov-card p { margin: 0 0 16px; color: var(--ink-soft); font-size: 0.9rem; flex: 1; }
+  .ov-tags { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+  .ov-more {
+    margin-top: 14px; font-size: 0.82rem; font-weight: 700; color: var(--accent);
+    transition: transform 0.18s;
+  }
+  .ov-card:hover .ov-more { transform: translateX(4px); }
+
+  /* ---------- Works ---------- */
+  .work {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    margin-bottom: 36px;
+    transition: box-shadow 0.25s, transform 0.25s;
+  }
+  .work:hover { box-shadow: var(--shadow); transform: translateY(-3px); }
+  .work-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 20px; padding: 30px 32px 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .work-head .num {
+    font-size: 0.8rem; font-weight: 800; color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+  .work-head h3 { margin: 6px 0 6px; font-size: 1.45rem; font-weight: 800; }
+  .work-head .lead { color: var(--ink-soft); margin: 0; max-width: 640px; }
+  .badge {
+    flex-shrink: 0;
+    font-size: 0.74rem; font-weight: 800; letter-spacing: 0.05em;
+    padding: 6px 12px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid var(--accent-line); white-space: nowrap;
+  }
+  .work-body { padding: 26px 32px 32px; }
+  .work-cols {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 30px;
+  }
+  .work-cols h5 {
+    margin: 0 0 12px; font-size: 0.78rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted); font-weight: 800;
+  }
+  .feat-list { list-style: none; padding: 0; margin: 0; }
+  .feat-list li {
+    position: relative; padding-left: 24px; margin-bottom: 10px;
+    color: var(--ink-soft); font-size: 0.94rem;
+  }
+  .feat-list li::before {
+    content: ""; position: absolute; left: 4px; top: 11px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  }
+  .point-list { list-style: none; padding: 0; margin: 0; }
+  .point-list li {
+    position: relative; padding-left: 26px; margin-bottom: 12px;
+    color: var(--ink); font-size: 0.94rem;
+  }
+  .point-list li::before {
+    content: "▲"; position: absolute; left: 0; top: 0;
+    color: var(--accent); font-size: 0.7rem; line-height: 1.9;
+  }
+  .point-list li b { color: var(--ink); font-weight: 700; }
+
+  .tech-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .tech {
+    font-size: 0.8rem; font-weight: 700;
+    padding: 5px 11px; border-radius: 8px;
+    background: #f7ede4; color: #80675a;
+  }
+
+  .shots {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+    margin-top: 26px;
+  }
+  .shots img {
+    width: 100%; aspect-ratio: 16/9; object-fit: cover;
+    border-radius: 10px; border: 1px solid var(--line);
+    cursor: zoom-in; transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .shots img:hover { transform: scale(1.04); box-shadow: var(--shadow-sm); }
+
+  .work-meta {
+    margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--line);
+    display: flex; flex-wrap: wrap; gap: 28px;
+  }
+  .work-meta div span {
+    display: block; font-size: 0.74rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em; font-weight: 800;
+  }
+  .work-meta div strong { font-size: 0.95rem; font-weight: 700; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    background: var(--bg); color: #c9bcae;
+    padding: 56px 0; text-align: center;
+  }
+  footer .brand { color: #fff; justify-content: center; margin-bottom: 14px; }
+  footer p { margin: 6px 0; font-size: 0.9rem; }
+  footer .small { color: #8a7a6b; font-size: 0.8rem; margin-top: 18px; }
+
+  /* ---------- Lightbox ---------- */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(24, 14, 8, 0.92);
+    display: none; align-items: center; justify-content: center;
+    padding: 28px; cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 12px; }
+
+  /* ---------- Reveal animation ---------- */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 920px) {
+    .work-overview { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 820px) {
+    .nav-links {
+      position: absolute; top: 64px; left: 0; right: 0;
+      flex-direction: column; gap: 0;
+      background: #fff; border-bottom: 1px solid var(--line);
+      padding: 8px; display: none;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links a { padding: 12px 14px; }
+    .nav-toggle { display: block; }
+    .about-grid { grid-template-columns: 1fr; gap: 30px; }
+    .work-overview { grid-template-columns: 1fr; gap: 14px; }
+    .work-cols { grid-template-columns: 1fr; gap: 24px; }
+    .work-head { flex-direction: column; }
+    .shots { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .hero-inner { padding: 70px 0 76px; }
+    .work-head, .work-body { padding-left: 22px; padding-right: 22px; }
+    .hero-stats { gap: 26px; }
+  }
+
+  /* ---------- Reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal, .ov-card { opacity: 1 !important; transform: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand"><span class="dot"></span>Dev Portfolio</div>
+    <nav class="nav-links" id="navLinks">
+      <a href="#about">About</a>
+      <a href="#works">Works</a>
+      <a href="#work-kakeibo">家計簿</a>
+      <a href="#work-novel">ノベルゲーム</a>
+      <a href="#work-kintai">勤怠管理</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="メニュー">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2a211c" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="blob b1"></span>
+  <span class="blob b2"></span>
+  <span class="blob b3"></span>
+  <div class="wrap hero-inner">
+    <span class="eyebrow">Web &amp; App Development</span>
+    <h1>つくって、<span class="grad">運用まで</span>届ける開発を。</h1>
+    <p>
+      Webアプリからゲームまで、企画・設計・実装・公開を一人で完結させてきました。
+      「使い続けられる」「運用コストがかからない」を意識した個人開発の成果物をまとめています。
+    </p>
+    <div class="hero-cta">
+      <a href="#works" class="btn btn-primary">制作物を見る →</a>
+      <a href="#about" class="btn btn-ghost">スキルを見る</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><strong data-count="3">3</strong><span>掲載プロジェクト</span></div>
+      <div class="stat"><strong data-count="2">2</strong><span>稼働中のWebアプリ</span></div>
+      <div class="stat"><strong data-count="8">8</strong><span>マルチエンディング（ゲーム）</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">About</div>
+      <h2>個人開発で「最後まで動くもの」を</h2>
+      <p>要件定義からデプロイ・運用までを一貫して手がけることを大切にしています。</p>
+    </div>
+    <div class="about-grid">
+      <div class="reveal">
+        <p>
+          フロントエンドはVue.js、バックエンドはGoogle Apps ScriptやFlask、ゲームはRen'Pyと、
+          目的に合わせて技術を選び、小さく作って実際に使いながら改善するスタイルで開発しています。
+        </p>
+        <p>
+          特に「自分や身近な人が毎日使えること」と「サーバー費用ゼロで運用し続けられること」を重視し、
+          Google スプレッドシートをデータベースとして活用したサーバーレス構成を多く採用しています。
+        </p>
+        <p>
+          仕様書・設計書を残しながら開発を進め、再利用できるモジュール設計やレスポンシブ対応など、
+          保守性・実用性を意識したものづくりを心がけています。
+        </p>
+      </div>
+      <div class="reveal">
+        <div class="skill-group">
+          <h4>Frontend</h4>
+          <div class="chips">
+            <span class="chip accent">Vue.js 3</span>
+            <span class="chip accent">JavaScript</span>
+            <span class="chip">HTML / CSS</span>
+            <span class="chip">Vite</span>
+            <span class="chip">Chart.js</span>
+            <span class="chip">レスポンシブ / PWA</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Backend / Infra</h4>
+          <div class="chips">
+            <span class="chip accent">Python</span>
+            <span class="chip">Google Apps Script</span>
+            <span class="chip">Flask</span>
+            <span class="chip">Google Sheets API</span>
+            <span class="chip">Docker</span>
+            <span class="chip">AWS</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Game / Other</h4>
+          <div class="chips">
+            <span class="chip accent">Ren'Py</span>
+            <span class="chip">Git</span>
+            <span class="chip">設計書 / 仕様書作成</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKS -->
+<section id="works">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">Works</div>
+      <h2>制作物</h2>
+      <p>実際に手元で使っているアプリや、企画から作り上げたゲームを掲載しています。</p>
+    </div>
+
+    <!-- 一覧（一目で把握 → 詳細へジャンプ） -->
+    <div class="work-overview">
+      <a class="ov-card" href="#work-kakeibo">
+        <div class="ov-top"><span class="ov-num">01</span><span class="ov-badge">Web App / SPA</span></div>
+        <h4>家計簿アプリ</h4>
+        <p>支出・予算・借金・勤怠を一元管理するサーバーレスSPA。</p>
+        <span class="ov-tags">Vue.js 3 · Google Apps Script · Chart.js</span>
+        <span class="ov-more">詳細を見る →</span>
+      </a>
+      <a class="ov-card" href="#work-novel">
+        <div class="ov-top"><span class="ov-num">02</span><span class="ov-badge">Game / Ren'Py</span></div>
+        <h4>ノベルゲーム「深夜のコンビニ」</h4>
+        <p>全8エンディングのマルチ分岐ホラーADV。企画・シナリオ・実装を担当。</p>
+        <span class="ov-tags">Ren'Py · Python</span>
+        <span class="ov-more">詳細を見る →</span>
+      </a>
+      <a class="ov-card" href="#work-kintai">
+        <div class="ov-top"><span class="ov-num">03</span><span class="ov-badge">Web App / PWA</span></div>
+        <h4>勤怠管理アプリ</h4>
+        <p>打刻で勤務時間を自動計算するスマホ向けPWA。1日複数回の出退勤・休憩・日報に対応。</p>
+        <span class="ov-tags">Google Apps Script · Google Sheets</span>
+        <span class="ov-more">詳細を見る →</span>
+      </a>
+    </div>
+
+    <!-- 1. 家計簿 -->
+    <article class="work reveal" id="work-kakeibo">
+      <div class="work-head">
+        <div>
+          <div class="num">PROJECT 01</div>
+          <h3>家計簿アプリ</h3>
+          <p class="lead">
+            支出・収入・予算・借金・バイト勤怠までを一元管理する、スマホ／PC両対応のSPA。
+            Google スプレッドシートをデータベースとして使い、サーバー費用ゼロで運用できる家計簿です。
+          </p>
+        </div>
+        <span class="badge">Web App / SPA</span>
+      </div>
+      <div class="work-body">
+        <div class="work-cols">
+          <div>
+            <h5>主な機能</h5>
+            <ul class="feat-list">
+              <li>月／週ごとの支出入力・一覧・合計、日平均の自動計算</li>
+              <li>予算設定と消化率・残額の可視化</li>
+              <li>収支分析グラフ（カテゴリ別・推移）と節約日カウント</li>
+              <li>既存データのCSV一括取込（列マッピング自動検出付き）</li>
+              <li>固定費カテゴリ管理・カテゴリの追加</li>
+              <li>PC＝サイドバー／スマホ＝タブバーの自動切替UI</li>
+            </ul>
+          </div>
+          <div>
+            <h5>技術的な工夫</h5>
+            <ul class="point-list">
+              <li><b>サーバーレス構成</b>：フロント（Vue）＋ Google Apps Script ＋ スプレッドシートで、運用コスト0円・インフラ管理不要を実現。</li>
+              <li><b>バッチ送信</b>：CSV一括取込は20件ずつに分割して送信し、GASの実行時間制限を回避。</li>
+              <li><b>秘密情報をフロントに持たない設計</b>：接続先URLは各端末のlocalStorageに保持し、コードには含めない。</li>
+              <li><b>関心の分離</b>：API通信（services）／画面（views）／ユーティリティ（utils）を分離した見通しの良い構成。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="work-meta">
+          <div><span>役割</span><strong>企画・設計・実装（個人開発）</strong></div>
+          <div><span>構成</span><strong>SPA + サーバーレスBFF</strong></div>
+          <div style="flex:1; min-width:240px;">
+            <span>技術スタック</span>
+            <div class="tech-row">
+              <span class="tech">Vue.js 3</span><span class="tech">Vue Router</span>
+              <span class="tech">Vite</span><span class="tech">Chart.js</span>
+              <span class="tech">PapaParse</span><span class="tech">Google Apps Script</span>
+              <span class="tech">Google Sheets</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- 2. ノベルゲーム -->
+    <article class="work reveal" id="work-novel">
+      <div class="work-head">
+        <div>
+          <div class="num">PROJECT 02</div>
+          <h3>ノベルゲーム「深夜のコンビニ」</h3>
+          <p class="lead">
+            霧に閉ざされた深夜のコンビニで、夜明けまで生き延びるホラー／サスペンスADV。
+            全8エンディングのマルチ分岐と周回要素を持ち、企画・シナリオ・実装をすべて担当しました。
+          </p>
+        </div>
+        <span class="badge">Game / Ren'Py</span>
+      </div>
+      <div class="work-body">
+        <div class="work-cols">
+          <div>
+            <h5>主な機能・ボリューム</h5>
+            <ul class="feat-list">
+              <li>プロローグ＋全5章のマルチ分岐シナリオ（最大4分岐の大分岐あり）</li>
+              <li>到達条件の異なる全8エンディング（トゥルー／隠しエンド含む）</li>
+              <li>手がかり収集システム（Tabキーで一覧表示）</li>
+              <li>エンディングギャラリー・周回数に応じた解放要素</li>
+              <li>時刻HUD、画面揺れ・フラッシュなどのホラー演出</li>
+            </ul>
+          </div>
+          <div>
+            <h5>設計の工夫</h5>
+            <ul class="point-list">
+              <li><b>再利用可能なエンジン層</b>：演出・フラグ管理・HUD・セーブ等を <code>engine/</code> モジュールに分離し、他作品へ流用可能に。</li>
+              <li><b>フラグの一元管理</b>：全ストーリーフラグを辞書で定義し、開始時に一括リセット。手がかり数も配列から自動算出。</li>
+              <li><b>データ駆動のUI</b>：エンディング一覧や手がかりリストをデータ配列から生成し、追加・変更を容易に。</li>
+              <li><b>永続化と周回設計</b>：到達エンドと周回数をpersistentで保存し、2周目以降の追加分岐を制御。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="shots">
+          <img src="assets/novel-prologue.png" alt="プロローグの場面" loading="lazy" />
+          <img src="assets/novel-chapter1.png" alt="第1章の場面" loading="lazy" />
+          <img src="assets/novel-chapter2.png" alt="第2章の場面" loading="lazy" />
+          <img src="assets/novel-chapter3.png" alt="第3章の場面" loading="lazy" />
+          <img src="assets/novel-ending.png" alt="エンディングの場面" loading="lazy" />
+        </div>
+        <div class="work-meta">
+          <div><span>役割</span><strong>企画・シナリオ・実装（個人制作）</strong></div>
+          <div><span>規模</span><strong>全5章 / 8エンディング</strong></div>
+          <div style="flex:1; min-width:240px;">
+            <span>技術スタック</span>
+            <div class="tech-row">
+              <span class="tech">Ren'Py</span><span class="tech">Python</span>
+              <span class="tech">ATL Transform</span><span class="tech">Web / Androidビルド</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- 3. 勤怠管理 -->
+    <article class="work reveal" id="work-kintai">
+      <div class="work-head">
+        <div>
+          <div class="num">PROJECT 03</div>
+          <h3>勤怠管理アプリ</h3>
+          <p class="lead">
+            出退勤・休憩・日報を一元管理するスマホ向けPWA。打刻するとセッションごとの勤務時間を自動計算し、
+            1日に複数回の出退勤にも対応した実用ツールです（v1.1.0）。
+          </p>
+        </div>
+        <span class="badge">Web App / PWA</span>
+      </div>
+      <div class="work-body">
+        <div class="work-cols">
+          <div>
+            <h5>主な機能</h5>
+            <ul class="feat-list">
+              <li>出勤・退勤打刻と、セッションごとの勤務時間の自動計算</li>
+              <li>1日に複数回の出退勤を記録し、合計勤務時間を自動集計</li>
+              <li>休憩開始／終了の記録と休憩時間の集計（複数回対応）</li>
+              <li>箇条書き形式の日報作成・更新（あとから追記・編集可）</li>
+              <li>勤務状態を色分け表示するステータスバッジ＋秒単位の時計</li>
+            </ul>
+          </div>
+          <div>
+            <h5>技術的な工夫</h5>
+            <ul class="point-list">
+              <li><b>サーバーレス／無料運用</b>：GAS＋スプレッドシートのみで完結し、Googleアカウントだけで動作。</li>
+              <li><b>セッション設計</b>：1日複数回の出退勤を配列で管理し、合計勤務時間をサーバー側で算出（v1.1.0で対応）。</li>
+              <li><b>状態整合性の担保</b>：未退勤セッションの有無をチェックし、二重出勤や休憩中の退勤などの不整合を防止。</li>
+              <li><b>安全なUX</b>：退勤はアニメーション付きカスタムモーダルで確認し、通信中はボタンを無効化して二重送信を防止。</li>
+              <li><b>仕様書ドリブン開発</b>：機能IDごとに処理関数・事前条件・レスポンスを定義した仕様書を整備。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="work-meta">
+          <div><span>役割</span><strong>企画・設計・実装（個人開発）</strong></div>
+          <div><span>対象</span><strong>スマートフォン（PWA）</strong></div>
+          <div style="flex:1; min-width:240px;">
+            <span>技術スタック</span>
+            <div class="tech-row">
+              <span class="tech">Google Apps Script</span><span class="tech">Google Sheets</span>
+              <span class="tech">JavaScript</span><span class="tech">HTML / CSS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>Dev Portfolio</div>
+    <p>企画から運用まで、使い続けられるものづくりを。</p>
+    <p class="small">本ポートフォリオには個人を特定する情報は含めていません。<br/>連絡先・経歴等は別途お問い合わせください。</p>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightbox"><img src="" alt="拡大表示" id="lightboxImg" /></div>
+
+<script>
+  // モバイルメニュー
+  const toggle = document.getElementById('navToggle');
+  const links = document.getElementById('navLinks');
+  toggle.addEventListener('click', () => links.classList.toggle('open'));
+  links.querySelectorAll('a').forEach(a =>
+    a.addEventListener('click', () => links.classList.remove('open'))
+  );
+
+  // スクロール表示アニメーション（カード一覧の段差表示も含む）
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal, .work-overview').forEach(el => io.observe(el));
+
+  // 数値カウントアップ（ヒーローの実績）
+  const animateCount = (el) => {
+    const target = parseInt(el.dataset.count, 10) || 0;
+    const dur = 1200;
+    const start = performance.now();
+    const step = (now) => {
+      const p = Math.min((now - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased);
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  const statIO = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('[data-count]').forEach(animateCount);
+        statIO.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  const heroStats = document.querySelector('.hero-stats');
+  if (heroStats) statIO.observe(heroStats);
+
+  // スクロール進捗バー
+  const progress = document.getElementById('progress');
+  const updateProgress = () => {
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    progress.style.width = (max > 0 ? (doc.scrollTop / max) * 100 : 0) + '%';
+  };
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  // スクリーンショットのライトボックス
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightboxImg');
+  document.querySelectorAll('.shots img').forEach(img => {
+    img.addEventListener('click', () => { lbImg.src = img.src; lb.classList.add('open'); });
+  });
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+</script>
+</body>
+</html>

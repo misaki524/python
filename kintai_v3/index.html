@@ -224,6 +224,45 @@
       color: #bbb;
     }
 
+    .report-textarea + .field-label {
+      margin-top: 14px;
+    }
+
+    /* 日報の項目ラベル */
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .field-note {
+      font-size: 11px;
+      font-weight: 400;
+      color: #aaa;
+      margin-left: 4px;
+    }
+
+    /* コメント（読み取り専用表示） */
+    .comment-box {
+      width: 100%;
+      min-height: 56px;
+      border: 1px dashed #d6d6d6;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      background: #fafafa;
+      color: #444;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .comment-box.empty {
+      color: #bbb;
+      font-style: italic;
+    }
+
     /* ========================================
        トースト通知
        ======================================== */
@@ -420,7 +459,16 @@
     <!-- 日報カード -->
     <div class="card">
       <div class="card-title">📝 日報</div>
-      <textarea class="report-textarea" id="reportText" placeholder="・会議参加&#10;・資料作成&#10;・コードレビュー"></textarea>
+
+      <div class="field-label">タスク内容</div>
+      <textarea class="report-textarea" id="reportTask" placeholder="・会議参加&#10;・資料作成&#10;・コードレビュー"></textarea>
+
+      <div class="field-label">反省など</div>
+      <textarea class="report-textarea" id="reportReflection" placeholder="・〇〇に時間がかかった&#10;・明日は△△を優先する"></textarea>
+
+      <div class="field-label">コメント<span class="field-note">（担当者が記入）</span></div>
+      <div class="comment-box" id="reportComment">まだコメントはありません</div>
+
       <button class="btn btn-save-report" id="btnSaveReport" onclick="handleSaveReport()">💾 日報を保存</button>
     </div>
 
@@ -601,10 +649,23 @@
         breakListEl.innerHTML = bhtml;
       }
 
-      // 日報
-      var reportEl = document.getElementById('reportText');
-      if (data.report) {
-        reportEl.value = data.report;
+      // 日報（タスク内容・反省など）
+      // サーバーに保存値がある場合のみ反映し、未保存の入力を消さないようにする
+      if (data.task) {
+        document.getElementById('reportTask').value = data.task;
+      }
+      if (data.reflection) {
+        document.getElementById('reportReflection').value = data.reflection;
+      }
+
+      // コメント（読み取り専用・別の人が記入）
+      var commentEl = document.getElementById('reportComment');
+      if (data.comment) {
+        commentEl.textContent = data.comment;
+        commentEl.classList.remove('empty');
+      } else {
+        commentEl.textContent = 'まだコメントはありません';
+        commentEl.classList.add('empty');
       }
 
       // ステータス
@@ -733,9 +794,11 @@
     // 日報保存
     // ========================================
     function handleSaveReport() {
-      var text = document.getElementById('reportText').value.trim();
-      if (!text) {
-        showToast('日報を入力してください', true);
+      var task = document.getElementById('reportTask').value.trim();
+      var reflection = document.getElementById('reportReflection').value.trim();
+      // 記載忘れOK: どちらか一方でも入力があれば保存（あとで追記・編集できる）
+      if (!task && !reflection) {
+        showToast('タスク内容か反省などを入力してください', true);
         return;
       }
       document.getElementById('btnSaveReport').disabled = true;
@@ -751,7 +814,7 @@
           document.getElementById('btnSaveReport').disabled = false;
           showToast('エラーが発生しました', true);
         })
-        .saveReport(text);
+        .saveReport(task, reflection);
     }
 
     // ========================================

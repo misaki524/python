@@ -152,8 +152,17 @@ async function doImport() {
   if (!mappedRows.value.length) return
   const count = mappedRows.value.length
   await run(async () => {
-    await bulkSaveExpenses(mappedRows.value)
-    importResult.value = `${count}件のデータを取り込みました！`
+    const result = await bulkSaveExpenses(mappedRows.value)
+    const saved = Number(result?.saved || 0)
+    if (saved === count) {
+      importResult.value = `${count}件のデータを取り込みました！`
+    } else if (saved > 0) {
+      importResult.value = `${saved}/${count}件のみ保存されました。GAS側のログを確認してください。`
+      toast.error(`期待 ${count}件 のうち ${saved}件 しか保存されませんでした`)
+    } else {
+      importResult.value = ''
+      throw new Error(`保存件数が0件です。GASのデプロイが古い可能性があります（gas-code.js を貼り直して再デプロイしてください）`)
+    }
   }, { errorMessage: '取込に失敗しました' })
 }
 </script>

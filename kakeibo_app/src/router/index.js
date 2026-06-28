@@ -4,6 +4,7 @@ const routes = [
   { path: '/', redirect: '/monthly' },
   { path: '/monthly', name: 'monthly', component: () => import('../views/MonthlyView.vue') },
   { path: '/weekly', name: 'weekly', component: () => import('../views/WeeklyView.vue') },
+  { path: '/annual', name: 'annual', component: () => import('../views/AnnualView.vue') },
   { path: '/income', name: 'income', component: () => import('../views/IncomeView.vue') },
   { path: '/budget', name: 'budget', component: () => import('../views/BudgetView.vue') },
   { path: '/work', name: 'work', component: () => import('../views/WorkView.vue') },
