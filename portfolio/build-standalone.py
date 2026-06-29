@@ -5,9 +5,10 @@
 出力された単一ファイルだけで、フォルダ無し・ネット接続無しで閲覧できます。
 
 出力:
-  dist/index.html       … Netlify Drop 等でWeb公開する用（distフォルダをドラッグ）
+  portfolio/dist/index.html   … ローカル閲覧用（ダブルクリックで開ける）
+  docs/index.html             … GitHub Pages 公開用（main の docs/ をPages設定で配信）
 
-使い方:  cd portfolio && python3 build-standalone.py
+使い方:  python3 portfolio/build-standalone.py
 """
 import base64
 import pathlib
@@ -16,8 +17,10 @@ import subprocess
 import tempfile
 
 HERE = pathlib.Path(__file__).parent
+REPO_ROOT = HERE.parent
 SRC = HERE / "index.html"
 DIST = HERE / "dist" / "index.html"
+DOCS = REPO_ROOT / "docs" / "index.html"
 MAX_PX = 1280       # 長辺の最大ピクセル
 JPEG_QUALITY = 82   # 画質 (0-100)
 
@@ -41,9 +44,14 @@ def to_data_uri(rel_path: str) -> str:
 html = SRC.read_text(encoding="utf-8")
 html = re.sub(r'src="(assets/[^"]+)"', lambda m: f'src="{to_data_uri(m.group(1))}"', html)
 
-DIST.parent.mkdir(parents=True, exist_ok=True)
-DIST.write_text(html, encoding="utf-8")
+for out_path in (DIST, DOCS):
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(html, encoding="utf-8")
+
+# Jekyll処理を無効化（先頭がアンダースコアのパス等を素通しさせる）
+(DOCS.parent / ".nojekyll").touch()
 
 size_mb = DIST.stat().st_size / 1024 / 1024
 print(f"作成しました ({size_mb:.1f} MB):")
-print(f"  dist/index.html   … Web公開用（このdistフォルダをNetlify Dropにドラッグ）")
+print(f"  portfolio/dist/index.html  … ローカル閲覧用（ダブルクリックで開ける）")
+print(f"  docs/index.html            … GitHub Pages 公開用（commit & push で反映）")
