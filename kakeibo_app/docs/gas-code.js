@@ -47,6 +47,7 @@ function handleRequest(e) {
       case 'initSheets': result = initSheets(); break;
       case 'getExpenses': result = getExpenses(params.yearMonth || body.yearMonth); break;
       case 'saveExpense': result = saveExpense(body); break;
+      case 'updateExpense': result = updateExpense(body); break;
       case 'deleteExpense': result = deleteRow_('Expenses', 'expense_id', body.id); break;
       case 'bulkSaveExpenses': result = bulkSaveExpenses(body.expenses); break;
       case 'getIncome': result = getIncome(params.yearMonth || body.yearMonth); break;
@@ -260,6 +261,26 @@ function saveExpense(data) {
   ];
   appendRow_('Expenses', row);
   return { saved: true };
+}
+
+function updateExpense(data) {
+  if (!data.id) throw new Error('id is required');
+  const all = getSheetData_('Expenses');
+  const target = all.find(e => String(e.expense_id) === String(data.id));
+  if (!target) throw new Error('該当する支出が見つかりません');
+  const row = [
+    data.id,
+    target.timestamp || new Date().toISOString(),
+    data.dateStr,
+    data.dateStr.substring(0, 7),
+    data.category,
+    data.itemName || '',
+    Number(data.amount),
+    data.paymentMethod || 'cash',
+    data.isFixed ? 'TRUE' : 'FALSE',
+  ];
+  updateRow_('Expenses', target._row, row);
+  return { updated: true };
 }
 
 function bulkSaveExpenses(expenses) {

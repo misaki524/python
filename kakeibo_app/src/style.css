@@ -104,22 +104,31 @@ body {
   background: var(--surface);
   border-top: 1px solid var(--border);
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-start;
   align-items: center;
   padding-bottom: env(safe-area-inset-bottom, 0);
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
   z-index: 100;
+}
+.tab-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
-  padding: 0.25rem;
+  padding: 0.25rem 0.5rem;
   color: var(--text-muted);
   text-decoration: none;
   font-size: 0.65rem;
-  min-width: 0;
+  flex: 0 0 auto;
+  min-width: 56px;
 }
 
 .tab-item .tab-icon {

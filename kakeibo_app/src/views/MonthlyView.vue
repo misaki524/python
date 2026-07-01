@@ -7,7 +7,7 @@
     </div>
 
     <div class="card">
-      <h2 class="page-title">支出を追加</h2>
+      <h2 class="page-title">{{ editingId ? '支出を編集' : '支出を追加' }}</h2>
       <div class="form-group">
         <label>日付</label>
         <input type="date" v-model="form.dateStr" />
@@ -54,9 +54,12 @@
           </button>
         </div>
       </div>
-      <button class="btn btn-primary btn-block" @click="submitExpense" :disabled="saving">
-        {{ saving ? '保存中...' : '保存' }}
-      </button>
+      <div style="display: flex; gap: 0.5rem">
+        <button class="btn btn-primary btn-block" @click="submitExpense" :disabled="saving" style="flex: 1">
+          {{ saving ? '保存中...' : editingId ? '更新' : '保存' }}
+        </button>
+        <button v-if="editingId" class="btn btn-block" style="flex: 0 0 6rem; background: var(--border)" @click="cancelEdit">キャンセル</button>
+      </div>
     </div>
 
     <div class="card">
@@ -91,6 +94,7 @@
               </div>
             </div>
             <span class="expense-amount">{{ Number(exp.amount).toLocaleString() }}円</span>
+            <button class="btn btn-sm" style="background: var(--primary); color: #fff" @click="startEdit(exp)">編集</button>
             <button class="btn btn-danger btn-sm" @click="removeExpense(exp.expense_id)">削除</button>
           </li>
         </template>
@@ -102,7 +106,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { getCategories, addCategory, PAYMENT_METHODS, getCategoryColor, getCategoryIcon, getPaymentLabel, isCategoryDeleted } from '../utils/categories'
-import { getExpenses, saveExpense, deleteExpense, isConfigured } from '../services/sheets-api'
+import { getExpenses, saveExpense, updateExpense, deleteExpense, isConfigured } from '../services/sheets-api'
 import { useMonthNav } from '../composables/useMonthNav'
 import { useAsync } from '../composables/useAsync'
 import { useToast } from '../composables/useToast'
@@ -119,6 +123,7 @@ const expenses = ref([])
 const categories = ref(getCategories())
 const showAddCategory = ref(false)
 const newCategoryName = ref('')
+const editingId = ref('')
 
 const form = ref({
   dateStr: today.toISOString().slice(0, 10),
@@ -127,6 +132,33 @@ const form = ref({
   amount: '',
   paymentMethod: 'cash',
 })
+
+function resetForm() {
+  form.value = {
+    dateStr: today.toISOString().slice(0, 10),
+    category: '',
+    itemName: '',
+    amount: '',
+    paymentMethod: 'cash',
+  }
+  editingId.value = ''
+}
+
+function startEdit(exp) {
+  editingId.value = exp.expense_id
+  form.value = {
+    dateStr: exp.date_str || today.toISOString().slice(0, 10),
+    category: exp.category || '',
+    itemName: exp.item_name || '',
+    amount: Number(exp.amount) || '',
+    paymentMethod: exp.payment_method || 'cash',
+  }
+  if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function cancelEdit() {
+  resetForm()
+}
 
 const total = computed(() => expenses.value.reduce((s, e) => s + Number(e.amount), 0))
 
@@ -178,26 +210,34 @@ async function fetchExpenses() {
 
 async function submitExpense() {
   if (!form.value.amount || !form.value.category) return
+  const isEdit = !!editingId.value
   await runSave(async () => {
     const cat = categories.value.find(c => c.name === form.value.category)
-    await saveExpense({
+    const payload = {
       dateStr: form.value.dateStr,
       category: form.value.category,
       itemName: form.value.itemName,
       amount: form.value.amount,
       paymentMethod: form.value.paymentMethod,
       isFixed: cat?.isFixed || false,
-    })
-    form.value.itemName = ''
-    form.value.amount = ''
+    }
+    if (isEdit) {
+      await updateExpense({ ...payload, id: editingId.value })
+      resetForm()
+    } else {
+      await saveExpense(payload)
+      form.value.itemName = ''
+      form.value.amount = ''
+    }
     await fetchExpenses()
-  }, { errorMessage: '保存に失敗しました', successMessage: '保存しました' })
+  }, { errorMessage: isEdit ? '更新に失敗しました' : '保存に失敗しました', successMessage: isEdit ? '更新しました' : '保存しました' })
 }
 
 async function removeExpense(id) {
   if (!(await confirm('この支出を削除しますか？', { danger: true, confirmText: '削除' }))) return
   await run(async () => {
     await deleteExpense(id)
+    if (editingId.value === id) resetForm()
     await fetchExpenses()
   }, { errorMessage: '削除に失敗しました', successMessage: '削除しました' })
 }

@@ -39,6 +39,10 @@ export async function saveExpense(data) {
   return callGAS('saveExpense', data)
 }
 
+export async function updateExpense(data) {
+  return callGAS('updateExpense', data)
+}
+
 export async function deleteExpense(id) {
   return callGAS('deleteExpense', { id })
 }

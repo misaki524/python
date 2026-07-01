@@ -44,7 +44,7 @@ const tabs = [
   { path: '/settings', icon: '⚙️', label: '設定' },
 ]
 
-const mobileTabs = computed(() => tabs.slice(0, 8))
+const mobileTabs = computed(() => tabs)
 
 const isMobile = ref(window.innerWidth <= 768)
 
