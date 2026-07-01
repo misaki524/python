@@ -75,7 +75,7 @@
               <td style="padding: 0.3rem">{{ row.itemName }}</td>
               <td style="padding: 0.3rem">{{ row.category }}</td>
               <td style="padding: 0.3rem; text-align: right">{{ Number(row.amount).toLocaleString() }}</td>
-              <td style="padding: 0.3rem">{{ row.paymentMethod === 'card' ? 'カード' : '現金' }}</td>
+              <td style="padding: 0.3rem">{{ getPaymentLabel(row.paymentMethod) }}</td>
             </tr>
           </tbody>
         </table>
@@ -100,6 +100,7 @@
 import { ref, computed } from 'vue'
 import { parseCSV, mapCSVToExpenses } from '../utils/csv-import'
 import { bulkSaveExpenses, isConfigured } from '../services/sheets-api'
+import { getPaymentLabel } from '../utils/categories'
 import { useAsync } from '../composables/useAsync'
 import { useToast } from '../composables/useToast'
 

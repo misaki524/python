@@ -95,6 +95,7 @@ export const PAYMENT_METHODS = [
   { value: 'card', label: 'カード' },
   { value: 'dcard', label: 'Dカード' },
   { value: 'debit', label: '口座引落' },
+  { value: 'installment', label: '分割払い' },
 ]
 
 // 有効・削除済みの両方から検索（過去データの色・アイコンを保持するため）

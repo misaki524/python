@@ -35,7 +35,7 @@ const tabs = [
   { path: '/monthly', icon: '📅', label: '月の支出' },
   { path: '/weekly', icon: '📆', label: '週の支出' },
   { path: '/annual', icon: '🗓️', label: '年間' },
-  { path: '/income', icon: '💵', label: '収入・収支' },
+  { path: '/income', icon: '💵', label: '収入' },
   { path: '/budget', icon: '💰', label: '予算' },
   { path: '/work', icon: '⏰', label: 'バイト' },
   { path: '/debt', icon: '📋', label: '借金' },

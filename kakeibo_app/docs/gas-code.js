@@ -114,8 +114,8 @@ function initSheets() {
     }
 
     // 1行目: 英語ヘッダー（プログラム用）。スキーマ変更時も追従するよう全列を比較
-    const existing = sheet.getRange(1, 1, 1, headers.length).getValues()[0];
-    if (headers.some((h, i) => existing[i] !== h)) {
+    const currentHeaders = sheet.getRange(1, 1, 1, headers.length).getValues()[0];
+    if (headers.some((h, i) => currentHeaders[i] !== h)) {
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     }
 
@@ -155,6 +155,15 @@ function initSheets() {
     for (let c = 1; c <= headers.length; c++) {
       sheet.autoResizeColumn(c);
     }
+
+    // テキスト列が日付に自動変換されないよう、書式を明示する
+    const TEXT_COLS = ['year_month', 'date_str', 'repaid_date', 'timestamp', 'start_time', 'end_time'];
+    const dataRows = Math.max(sheet.getMaxRows() - 2, 1);
+    headers.forEach((h, i) => {
+      if (TEXT_COLS.includes(h)) {
+        sheet.getRange(3, i + 1, dataRows, 1).setNumberFormat('@');
+      }
+    });
   }
   return {
     message: 'シート初期化完了（日本語ヘッダー・色分け適用済み）',
@@ -177,9 +186,25 @@ function getSheetData_(sheetName) {
   const jpHeaders = HEADERS_JP[sheetName];
   // 2行目が日本語説明行ならスキップ（データは3行目から）
   const startRow = (jpHeaders && data[1][0] === jpHeaders[0]) ? 2 : 1;
+  const tz = Session.getScriptTimeZone();
   return data.slice(startRow).map((row, idx) => {
     const obj = { _row: idx + startRow + 1 };
-    headers.forEach((h, i) => { obj[h] = row[i]; });
+    headers.forEach((h, i) => {
+      let val = row[i];
+      // Sheetsが文字列を勝手に日付化することがあるので、列名に応じて文字列へ戻す
+      if (val instanceof Date) {
+        if (h === 'year_month') {
+          val = Utilities.formatDate(val, tz, 'yyyy-MM');
+        } else if (h === 'date_str' || h === 'repaid_date') {
+          val = Utilities.formatDate(val, tz, 'yyyy-MM-dd');
+        } else if (h === 'timestamp') {
+          val = val.toISOString();
+        } else if (h === 'start_time' || h === 'end_time') {
+          val = Utilities.formatDate(val, tz, 'HH:mm');
+        }
+      }
+      obj[h] = val;
+    });
     return obj;
   });
 }
